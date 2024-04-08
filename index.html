@@ -29,9 +29,9 @@
                     const topicId = childSnapshot.key;
                     const topicElement = document.createElement('div');
                     topicElement.innerHTML = `
-                        <h2>${topic.Title}</h2>
-                        <p>${topic.Description}</p>
-                        <p><strong>Tags:</strong> ${topic.Tag}</p>
+                        <h2>${topic.title}</h2>
+                        <p>${topic.description}</p>
+                        <p><strong>Tags:</strong> ${topic.tag}</p>
                         <button onclick="viewTopicDetails('${topicId}')">View Details</button>
                         <hr>
                     `;
