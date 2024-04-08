@@ -68,6 +68,11 @@
                             <h3>${post.title}</h3>
                             <p>${post.content}</p>
                             <p>Posted by: <span id="author-${doc.id}">Loading...</span></p>
+                            <form id="comment-form-${doc.id}" onsubmit="createComment('${doc.id}'); return false;">
+                                <label for="comment-text-${doc.id}">Comment:</label><br>
+                                <textarea id="comment-text-${doc.id}" name="comment-text" rows="2" required></textarea><br>
+                                <button type="submit">Add Comment</button>
+                            </form>
                             <hr>
                         `;
                         document.getElementById('posts-list').appendChild(postElement);
@@ -96,6 +101,41 @@
             console.error('Topic ID not found in URL parameter!');
             // Display error message to the user
             alert('Topic ID not found in URL parameter.');
+        }
+
+        // Function to handle comment creation form submission
+        function createComment(postId) {
+            const commentText = document.getElementById(`comment-text-${postId}`).value.trim();
+
+            // Check if the user is authenticated
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                console.error('User not authenticated!');
+                // Display error message to the user
+                alert('Please sign in to create a comment.');
+                return;
+            }
+
+            // Create new comment object
+            const newComment = {
+                text: commentText,
+                postId: postId,
+                authorId: user.uid,
+                createdAt: firebase.firestore.Timestamp.now()
+            };
+
+            // Add the new comment to Firestore
+            db.collection('comments').add(newComment)
+                .then((docRef) => {
+                    console.log('New comment created with ID:', docRef.id);
+                    // Refresh the page to display the new comment
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error adding comment:', error);
+                    // Display error message to the user
+                    alert('Error creating comment. Please try again.');
+                });
         }
     </script>
 </body>
