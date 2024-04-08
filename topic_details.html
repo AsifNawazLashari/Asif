@@ -20,13 +20,14 @@
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
     <script src="firebase-config.js"></script>
     <script>
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
-        const db = firebase.firestore();
+        const db = firebase.database();
 
         // Function to extract topic ID from URL parameter
         function getTopicIdFromUrl() {
@@ -34,13 +35,13 @@
             return urlParams.get('id');
         }
 
-        // Function to fetch and display topic details from Firestore
+        // Function to fetch and display topic details from Realtime Database
         const topicId = getTopicIdFromUrl();
         if (topicId) {
-            db.collection('topics').doc(topicId).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const topic = doc.data();
+            db.ref('topics/' + topicId).once('value')
+                .then((snapshot) => {
+                    const topic = snapshot.val();
+                    if (topic) {
                         const topicDetailsElement = document.createElement('div');
                         topicDetailsElement.innerHTML = `
                             <h2>${topic.title}</h2>
@@ -49,7 +50,7 @@
                         `;
                         document.getElementById('topic-details').appendChild(topicDetailsElement);
                     } else {
-                        console.error('No such document!');
+                        console.error('No such topic!');
                         // Display error message to the user
                         alert('Topic not found.');
                     }
@@ -59,18 +60,19 @@
                 });
 
             // Function to fetch and display posts associated with the topic
-            db.collection('posts').where('topicId', '==', topicId).get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        const post = doc.data();
+            db.ref('posts').orderByChild('topicId').equalTo(topicId).once('value')
+                .then((snapshot) => {
+                    snapshot.forEach((childSnapshot) => {
+                        const post = childSnapshot.val();
+                        const postId = childSnapshot.key;
                         const postElement = document.createElement('div');
                         postElement.innerHTML = `
                             <h3>${post.title}</h3>
                             <p>${post.content}</p>
-                            <p>Posted by: <span id="author-${doc.id}">Loading...</span></p>
-                            <form id="comment-form-${doc.id}" onsubmit="createComment('${doc.id}'); return false;">
-                                <label for="comment-text-${doc.id}">Comment:</label><br>
-                                <textarea id="comment-text-${doc.id}" name="comment-text" rows="2" required></textarea><br>
+                            <p>Posted by: <span id="author-${postId}">Loading...</span></p>
+                            <form id="comment-form-${postId}" onsubmit="createComment('${postId}'); return false;">
+                                <label for="comment-text-${postId}">Comment:</label><br>
+                                <textarea id="comment-text-${postId}" name="comment-text" rows="2" required></textarea><br>
                                 <button type="submit">Add Comment</button>
                             </form>
                             <hr>
@@ -78,19 +80,14 @@
                         document.getElementById('posts-list').appendChild(postElement);
 
                         // Get author's display name
-                        db.collection('users').doc(post.authorId).get()
-                            .then((userDoc) => {
-                                if (userDoc.exists) {
-                                    const authorName = userDoc.data().displayName;
-                                    document.getElementById(`author-${doc.id}`).textContent = authorName;
-                                } else {
-                                    console.error('No such user document!');
-                                    document.getElementById(`author-${doc.id}`).textContent = 'Unknown';
-                                }
+                        db.ref('users/' + post.authorId).once('value')
+                            .then((userSnapshot) => {
+                                const authorName = userSnapshot.val().displayName;
+                                document.getElementById(`author-${postId}`).textContent = authorName;
                             })
                             .catch((error) => {
                                 console.error('Error getting user document:', error);
-                                document.getElementById(`author-${doc.id}`).textContent = 'Unknown';
+                                document.getElementById(`author-${postId}`).textContent = 'Unknown';
                             });
                     });
                 })
@@ -121,13 +118,13 @@
                 text: commentText,
                 postId: postId,
                 authorId: user.uid,
-                createdAt: firebase.firestore.Timestamp.now()
+                createdAt: firebase.database.ServerValue.TIMESTAMP
             };
 
-            // Add the new comment to Firestore
-            db.collection('comments').add(newComment)
-                .then((docRef) => {
-                    console.log('New comment created with ID:', docRef.id);
+            // Add the new comment to Realtime Database
+            db.ref('comments').push(newComment)
+                .then(() => {
+                    console.log('New comment created for post:', postId);
                     // Refresh the page to display the new comment
                     window.location.reload();
                 })
