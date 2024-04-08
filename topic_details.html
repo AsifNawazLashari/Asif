@@ -11,6 +11,11 @@
         <!-- Topic details will be dynamically added here -->
     </div>
 
+    <h2>Posts</h2>
+    <div id="posts-list">
+        <!-- Posts associated with the topic will be dynamically added here -->
+    </div>
+
     <a href="index.html">Back to Homepage</a>
 
     <!-- Firebase SDK -->
@@ -52,6 +57,41 @@
                 .catch((error) => {
                     console.error('Error fetching topic details:', error);
                 });
+
+            // Function to fetch and display posts associated with the topic
+            db.collection('posts').where('topicId', '==', topicId).get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const post = doc.data();
+                        const postElement = document.createElement('div');
+                        postElement.innerHTML = `
+                            <h3>${post.title}</h3>
+                            <p>${post.content}</p>
+                            <p>Posted by: <span id="author-${doc.id}">Loading...</span></p>
+                            <hr>
+                        `;
+                        document.getElementById('posts-list').appendChild(postElement);
+
+                        // Get author's display name
+                        db.collection('users').doc(post.authorId).get()
+                            .then((userDoc) => {
+                                if (userDoc.exists) {
+                                    const authorName = userDoc.data().displayName;
+                                    document.getElementById(`author-${doc.id}`).textContent = authorName;
+                                } else {
+                                    console.error('No such user document!');
+                                    document.getElementById(`author-${doc.id}`).textContent = 'Unknown';
+                                }
+                            })
+                            .catch((error) => {
+                                console.error('Error getting user document:', error);
+                                document.getElementById(`author-${doc.id}`).textContent = 'Unknown';
+                            });
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error fetching posts:', error);
+                });
         } else {
             console.error('Topic ID not found in URL parameter!');
             // Display error message to the user
@@ -60,4 +100,3 @@
     </script>
 </body>
 </html>
-
