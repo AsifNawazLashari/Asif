@@ -54,7 +54,7 @@
             snapshot.forEach((childSnapshot) => {
                 const topic = childSnapshot.val();
                 const option = document.createElement('option');
-                option.value = topic.id;
+                option.value = childSnapshot.key; // Use key as value
                 option.text = topic.title;
                 topicSelect.appendChild(option);
             });
