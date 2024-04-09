@@ -13,12 +13,20 @@
         <!-- Topics will be dynamically added here -->
     </div>
 
-    <h2>Create New Topic</h2>
-    <div id="topic-form">
-        <input type="text" id="topic-title" placeholder="Enter topic title" required>
-        <input type="text" id="topic-description" placeholder="Enter topic description" required>
-        <input type="text" id="topic-tags" placeholder="Enter topic tags (comma-separated)">
-        <button id="submit-topic">Create Topic</button>
+    <button id="create-topic-button">Create New Topic</button>
+
+    <!-- Create Topic Popup Form -->
+    <div id="create-topic-popup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closeCreateTopicPopup()">&times;</span>
+            <h2>Create New Topic</h2>
+            <form id="topic-form">
+                <input type="text" id="topic-title" placeholder="Enter topic title" required>
+                <input type="text" id="topic-description" placeholder="Enter topic description" required>
+                <input type="text" id="topic-tags" placeholder="Enter topic tags (comma-separated)">
+                <button type="submit">Create Topic</button>
+            </form>
+        </div>
     </div>
 
     <!-- Firebase SDK -->
@@ -35,7 +43,6 @@
             messagingSenderId: "261987716644",
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
             measurementId: "G-YGQ1V6489M"
-        };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -85,6 +92,16 @@
             window.location.href = `topic_details.html?id=${topicId}`;
         }
 
+        // Function to open the create topic popup
+        function openCreateTopicPopup() {
+            document.getElementById('create-topic-popup').style.display = 'block';
+        }
+
+        // Function to close the create topic popup
+        function closeCreateTopicPopup() {
+            document.getElementById('create-topic-popup').style.display = 'none';
+        }
+
         // Function to handle topic creation
         const topicForm = document.getElementById('topic-form');
         const topicTitleInput = document.getElementById('topic-title');
@@ -109,6 +126,8 @@
                     tags: tags,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 }).then(() => {
+                    // Close the popup after successful submission
+                    closeCreateTopicPopup();
                     // Clear the input fields after successful submission
                     topicTitleInput.value = '';
                     topicDescriptionInput.value = '';
