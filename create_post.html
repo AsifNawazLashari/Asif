@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
     <title>Create New Post</title>
 </head>
 <body>
-    <h1>Create New Post Now</h1>
+    <h1>Create New Post Quickly</h1>
     <form id="post-form">
         <label for="post-title">Title:</label><br>
         <input type="text" id="post-title" name="post-title" required><br><br>
@@ -14,15 +15,23 @@
         <label for="post-content">Content:</label><br>
         <textarea id="post-content" name="post-content" rows="4" required></textarea><br><br>
         
+        <!-- Add a dropdown for selecting the topic -->
+        <label for="topic-select">Select Topic:</label><br>
+        <select id="topic-select" name="topic-select" required>
+            <option value="" disabled selected>Select a topic</option>
+            <!-- Topics will be dynamically added here -->
+        </select><br><br>
+        
         <button type="submit">Create Post</button>
     </form>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs
 
     <script>
+
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
@@ -32,12 +41,26 @@
             messagingSenderId: "261987716644",
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
             measurementId: "G-YGQ1V6489M"
-        };
-
+                
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
         const db = firebase.database();
+
+        // Get a reference to the topics in the database
+        const topicsRef = db.ref('topics');
+
+        // Populate the dropdown with topics from the database
+        topicsRef.once('value', (snapshot) => {
+            const topicSelect = document.getElementById('topic-select');
+            snapshot.forEach((childSnapshot) => {
+                const topic = childSnapshot.val();
+                const option = document.createElement('option');
+                option.value = topic.id;
+                option.text = topic.title;
+                topicSelect.appendChild(option);
+            });
+        });
 
         // Function to handle post creation form submission
         document.getElementById('post-form').addEventListener('submit', function(event) {
@@ -46,6 +69,7 @@
             // Get form values
             const title = document.getElementById('post-title').value;
             const content = document.getElementById('post-content').value;
+            const topicId = document.getElementById('topic-select').value;
 
             // Check if the user is authenticated
             const user = firebase.auth().currentUser;
@@ -59,8 +83,10 @@
             // Create new post object
             const newPostKey = db.ref().child('posts').push().key;
             const newPost = {
+                id: newPostKey,
                 title: title,
                 content: content,
+                topicId: topicId,
                 authorId: user.uid,
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             };
@@ -72,7 +98,7 @@
                     // Show success message
                     alert('Post created successfully!');
                     // Redirect to the topic details page
-                    window.location.href = `topic_details.html?id=${newPostKey}`;
+                    window.location.href = `topic_details.html?id=${topicId}`;
                 })
                 .catch((error) => {
                     console.error('Error adding post:', error);
@@ -87,5 +113,13 @@
 
 
 
-
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
+            authDomain: "alif-ac574.firebaseapp.com",
+            projectId: "alif-ac574",
+            storageBucket: "alif-ac574.appspot.com",
+            messagingSenderId: "261987716644",
+            appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
+            measurementId: "G-YGQ1V6489M"
         
