@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+
+            
+
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,7 +16,7 @@
         <!-- Topics will be dynamically added here -->
     </div>
 
-    <button id="create-topic-button">Create New Topic</button>
+    <button id="create-topic-button" onclick="openCreateTopicPopup()">Create New Topic</button>
 
     <!-- Create Topic Popup Form -->
     <div id="create-topic-popup" class="popup">
@@ -43,6 +46,7 @@
             messagingSenderId: "261987716644",
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
             measurementId: "G-YGQ1V6489M"
+        };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
