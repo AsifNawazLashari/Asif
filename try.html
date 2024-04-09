@@ -3,58 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>Post Data</title>
 </head>
 <body>
-    <h1>Homepage</h1>
-    <div id="loading" style="display: none;">Loading...</div>
-    <div id="topics-list">
-        <!-- Topics will be dynamically added here -->
+    <h1>Post Data</h1>
+    <div id="post-list">
+        <!-- Post data will be dynamically added here -->
     </div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script> <!-- Add this line -->
-    <script src="firebase-config.js"></script>
+    
+    <!-- Firebase configuration -->
+    <script src="firebase-config.js"></script> <!-- Include Firebase configuration -->
+    
+    <!-- Fetch and display post data -->
     <script>
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
-        const db = firebase.database();
-        const topicsList = document.getElementById('topics-list');
-        const loadingIndicator = document.getElementById('loading');
+        // Reference to your Firebase Realtime Database
+        const dbRef = firebase.database().ref('posts');
 
-        // Show loading indicator
-        loadingIndicator.style.display = 'block';
-
-// Function to fetch and display topics from Realtime Database
-db.ref('topics').once('value')
-    .then((snapshot) => {
-        snapshot.forEach((childSnapshot) => {
-            const topic = childSnapshot.val();
-            const topicId = childSnapshot.key;
-            const topicElement = document.createElement('div');
-            topicElement.innerHTML = `
-                <h2>${topic.titles}</h2>
-                <p>${topic.description}</p>
-                <p><strong>Tags:</strong> ${topic.tag}</p>
-                <button onclick="viewTopicDetails('${topicId}')">View Details</button>
-                <hr>
-            `;
-            document.getElementById('topics-list').appendChild(topicElement);
+        // Function to fetch and display post data from Realtime Database
+        dbRef.once('value', (snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                const post = childSnapshot.val();
+                const postElement = document.createElement('div');
+                postElement.innerHTML = `
+                    <h2>${post.title}</h2>
+                    <p>${post.content}</p>
+                    <p><strong>Author:</strong> ${post.author}</p>
+                    <hr>
+                `;
+                document.getElementById('post-list').appendChild(postElement);
+            });
+        }, (error) => {
+            console.error('Error fetching posts:', error);
         });
-    })
-    .catch((error) => {
-        console.error('Error fetching topics:', error);
-    });
-
-
-        // Function to navigate to topic details page
-        function viewTopicDetails(topicId) {
-            // Redirect to topic details page with the selected topic ID
-            window.location.href = `topic_details.html?id=${topicId}`;
-        }
     </script>
 </body>
 </html>
