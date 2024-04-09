@@ -28,6 +28,13 @@
         // Show loading indicator
         loadingIndicator.style.display = 'block';
 
+        // Function to format date
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
         // Function to fetch and display topics from Realtime Database
         db.ref('topics').once('value')
             .then((snapshot) => {
@@ -37,10 +44,11 @@
                     const topic = childSnapshot.val();
                     const topicId = childSnapshot.key;
                     const topicElement = document.createElement('div');
+                    const createdBy = topic.author; // Assuming author is stored in topic data
+                    const createdAt = formatDate(topic.createdAt); // Assuming createdAt is stored in topic data
                     topicElement.innerHTML = `
-                        <h2>${topic.title}</h2> <!-- Corrected: topic.title -->
+                        <h2>${topic.title} - Created by ${createdBy} on ${createdAt}</h2>
                         <p>${topic.description}</p>
-                        <p><strong>Tags:</strong> ${topic.tags}</p> <!-- Corrected: topic.tags -->
                         <button onclick="viewTopicDetails('${topicId}')">View Details</button>
                         <hr>
                     `;
