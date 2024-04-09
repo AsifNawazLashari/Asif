@@ -1,10 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Topic Details</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Style for posts */
+        .post {
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Topic Details</h1>
@@ -26,7 +34,6 @@
     <script>
         // Firebase configuration
         const firebaseConfig = {
-            
             apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
             authDomain: "alif-ac574.firebaseapp.com",
             projectId: "alif-ac574",
@@ -84,29 +91,14 @@
                         const post = childSnapshot.val();
                         const postId = childSnapshot.key;
                         const postElement = document.createElement('div');
+                        postElement.classList.add('post');
                         postElement.innerHTML = `
                             <h3>${post.title}</h3>
                             <p>${post.content}</p>
-                            <p>Posted by: <span id="author-${postId}">Loading...</span></p>
-                            <form id="comment-form-${postId}" onsubmit="createComment('${postId}'); return false;">
-                                <label for="comment-text-${postId}">Comment:</label><br>
-                                <textarea id="comment-text-${postId}" name="comment-text" rows="2" required></textarea><br>
-                                <button type="submit">Add Comment</button>
-                            </form>
+                            <p>Posted on: ${formatDate(post.createdAt)}</p>
                             <hr>
                         `;
                         document.getElementById('posts-list').appendChild(postElement);
-
-                        // Get author's display name
-                        db.ref('users/' + post.authorId).once('value')
-                            .then((userSnapshot) => {
-                                const authorName = userSnapshot.val().displayName;
-                                document.getElementById(`author-${postId}`).textContent = authorName;
-                            })
-                            .catch((error) => {
-                                console.error('Error getting user document:', error);
-                                document.getElementById(`author-${postId}`).textContent = 'Unknown';
-                            });
                     });
                 })
                 .catch((error) => {
@@ -116,39 +108,6 @@
             console.error('Topic ID not found in URL parameter!');
             alert('Topic ID not found in URL parameter.');
         }
-
-        // Function to handle comment creation form submission
-        function createComment(postId) {
-            const commentText = document.getElementById(`comment-text-${postId}`).value.trim();
-            const user = firebase.auth().currentUser;
-            if (!user) {
-                console.error('User not authenticated!');
-                alert('Please sign in to create a comment.');
-                return;
-            }
-            const newComment = {
-                text: commentText,
-                postId: postId,
-                authorId: user.uid,
-                createdAt: firebase.database.ServerValue.TIMESTAMP
-            };
-            db.ref('comments').push(newComment)
-                .then(() => {
-                    console.log('New comment created for post:', postId);
-                    window.location.reload();
-                })
-                .catch((error) => {
-                    console.error('Error adding comment:', error);
-                    alert('Error creating comment. Please try again.');
-                });
-        }
     </script>
 </body>
 </html>
-
-
-
-
-            
-            
-        
