@@ -3,23 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage Thread</title>
+    <title>Homepage</title>
 </head>
 <body>
-    <link rel="stylesheet" href="style.css">
     <h1>Homepage</h1>
     <div id="loading" style="display: none;">Loading...</div>
     <div id="topics-list">
         <!-- Topics will be dynamically added here -->
     </div>
 
+    <h2>Create New Topic</h2>
+    <div id="topic-form">
+        <input type="text" id="topic-title" placeholder="Enter topic title" required>
+        <input type="text" id="topic-description" placeholder="Enter topic description" required>
+        <input type="text" id="topic-tags" placeholder="Enter topic tags (comma-separated)">
+        <button id="submit-topic">Create Topic</button>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
-    
+
     <!-- Firebase configuration -->
     <script src="firebase.js"></script>
-    
+
     <!-- JavaScript code for fetching and displaying topics -->
     <script>
         const db = firebase.database();
@@ -45,11 +52,10 @@
                     const topic = childSnapshot.val();
                     const topicId = childSnapshot.key;
                     const topicElement = document.createElement('div');
-                    const createdBy = topic.author; // Assuming author is stored in topic data
-                    const createdAt = formatDate(topic.createdAt); // Assuming createdAt is stored in topic data
                     topicElement.innerHTML = `
-                        <h2>${topic.title} - Created by ${createdBy} on ${createdAt}</h2>
+                        <h2>${topic.title}</h2>
                         <p>${topic.description}</p>
+                        <p><strong>Tags:</strong> ${topic.tags.join(', ')}</p>
                         <button onclick="viewTopicDetails('${topicId}')">View Details</button>
                         <hr>
                     `;
@@ -67,6 +73,42 @@
             // Redirect to topic details page with the selected topic ID
             window.location.href = `topic_details.html?id=${topicId}`;
         }
+
+        // Function to handle topic creation
+        const topicForm = document.getElementById('topic-form');
+        const topicTitleInput = document.getElementById('topic-title');
+        const topicDescriptionInput = document.getElementById('topic-description');
+        const topicTagsInput = document.getElementById('topic-tags');
+
+        topicForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission behavior
+
+            // Get the topic title, description, and tags
+            const title = topicTitleInput.value.trim();
+            const description = topicDescriptionInput.value.trim();
+            const tags = topicTagsInput.value.trim().split(',').map(tag => tag.trim());
+
+            // Check if title and description are not empty
+            if (title && description) {
+                // Save the topic to the database
+                const newTopicRef = db.ref('topics').push();
+                newTopicRef.set({
+                    title: title,
+                    description: description,
+                    tags: tags,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                }).then(() => {
+                    // Clear the input fields after successful submission
+                    topicTitleInput.value = '';
+                    topicDescriptionInput.value = '';
+                    topicTagsInput.value = '';
+                }).catch((error) => {
+                    console.error('Error saving topic:', error);
+                });
+            } else {
+                alert('Please enter both topic title and description before submitting.');
+            }
+        });
     </script>
 </body>
 </html>
