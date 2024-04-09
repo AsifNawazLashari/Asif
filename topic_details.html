@@ -1,11 +1,10 @@
 
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Topic Details</title>
-    <link rel="stylesheet" href="style.css"> <!-- Include your CSS file here -->
 </head>
 <body>
     <h1>Topic Details</h1>
@@ -27,6 +26,7 @@
     <script>
         // Firebase configuration
         const firebaseConfig = {
+            
             apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
             authDomain: "alif-ac574.firebaseapp.com",
             projectId: "alif-ac574",
@@ -35,7 +35,7 @@
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
             measurementId: "G-YGQ1V6489M"
         };
-    
+
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
@@ -54,22 +54,22 @@
             return date.toLocaleDateString('en-US', options);
         }
 
+        // Retrieve and display topic details
         const topicId = getTopicIdFromUrl();
         if (topicId) {
-            // Fetch and display topic details
             db.ref('topics/' + topicId).once('value')
                 .then((snapshot) => {
                     const topic = snapshot.val();
                     if (topic) {
-                        const topicDetailsElement = document.getElementById('topic-details');
+                        const topicDetailsElement = document.createElement('div');
                         topicDetailsElement.innerHTML = `
                             <h2>${topic.title}</h2>
                             <p>${topic.description}</p>
                             <p><strong>Tags:</strong> ${topic.tags.join(', ')}</p>
                         `;
+                        document.getElementById('topic-details').appendChild(topicDetailsElement);
                     } else {
                         console.error('No such topic!');
-                        // Display error message to the user
                         alert('Topic not found.');
                     }
                 })
@@ -77,10 +77,9 @@
                     console.error('Error fetching topic details:', error);
                 });
 
-            // Fetch and display posts associated with the topic
+            // Retrieve and display posts associated with the topic
             db.ref('posts').orderByChild('topicId').equalTo(topicId).once('value')
                 .then((snapshot) => {
-                    const postsList = document.getElementById('posts-list');
                     snapshot.forEach((childSnapshot) => {
                         const post = childSnapshot.val();
                         const postId = childSnapshot.key;
@@ -96,7 +95,7 @@
                             </form>
                             <hr>
                         `;
-                        postsList.appendChild(postElement);
+                        document.getElementById('posts-list').appendChild(postElement);
 
                         // Get author's display name
                         db.ref('users/' + post.authorId).once('value')
@@ -115,46 +114,34 @@
                 });
         } else {
             console.error('Topic ID not found in URL parameter!');
-            // Display error message to the user
             alert('Topic ID not found in URL parameter.');
         }
 
         // Function to handle comment creation form submission
         function createComment(postId) {
             const commentText = document.getElementById(`comment-text-${postId}`).value.trim();
-
-            // Check if the user is authenticated
             const user = firebase.auth().currentUser;
             if (!user) {
                 console.error('User not authenticated!');
-                // Display error message to the user
                 alert('Please sign in to create a comment.');
                 return;
             }
-
-            // Create new comment object
             const newComment = {
                 text: commentText,
                 postId: postId,
                 authorId: user.uid,
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             };
-
-            // Add the new comment to Realtime Database
             db.ref('comments').push(newComment)
                 .then(() => {
                     console.log('New comment created for post:', postId);
-                    // Refresh the page to display the new comment
                     window.location.reload();
                 })
                 .catch((error) => {
                     console.error('Error adding comment:', error);
-                    // Display error message to the user
                     alert('Error creating comment. Please try again.');
                 });
         }
     </script>
 </body>
 </html>
-
-
