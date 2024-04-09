@@ -27,6 +27,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
 
     <script>
         // Firebase configuration
@@ -54,7 +55,7 @@
             snapshot.forEach((childSnapshot) => {
                 const topic = childSnapshot.val();
                 const option = document.createElement('option');
-                option.value = childSnapshot.key; // Use key as value
+                option.value = topic.id;
                 option.text = topic.title;
                 topicSelect.appendChild(option);
             });
