@@ -23,6 +23,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
 
     <script>
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
             authDomain: "alif-ac574.firebaseapp.com",
@@ -35,20 +36,16 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        
-        const db = firebase.database();
-        const postForm = document.getElementById('post-form');
 
-        postForm.addEventListener('submit', function(event) {
+        const db = firebase.database();
+
+        // Function to handle post creation form submission
+        document.getElementById('post-form').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent default form submission behavior
 
             // Get form values
             const title = document.getElementById('post-title').value;
             const content = document.getElementById('post-content').value;
-
-            // Get the topic ID from the URL parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const topicId = urlParams.get('topicId');
 
             // Check if the user is authenticated
             const user = firebase.auth().currentUser;
@@ -64,7 +61,6 @@
             const newPost = {
                 title: title,
                 content: content,
-                topicId: topicId,
                 authorId: user.uid,
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             };
@@ -76,7 +72,7 @@
                     // Show success message
                     alert('Post created successfully!');
                     // Redirect to the topic details page
-                    window.location.href = `topic_details.html?id=${topicId}`;
+                    window.location.href = `topic_details.html?id=${newPostKey}`;
                 })
                 .catch((error) => {
                     console.error('Error adding post:', error);
@@ -87,3 +83,9 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+        
