@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+
+            
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -64,13 +66,6 @@
             return urlParams.get('id');
         }
 
-        // Function to format date
-        function formatDate(timestamp) {
-            const date = new Date(timestamp);
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return date.toLocaleDateString('en-US', options);
-        }
-
         // Retrieve and display topic details
         const topicId = getTopicIdFromUrl();
         if (topicId) {
@@ -89,7 +84,7 @@
                             <p>${post.content}</p>
                             <div class="post-meta">
                                 <span>${post.author}</span> | 
-                                <span>${formatDate(post.createdAt)}</span>
+                                <span>${post.createdAt}</span>
                             </div>
                             <button class="comment-button">Comment</button>
                             <button class="vote-button">Vote</button>
