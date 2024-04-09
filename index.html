@@ -1,5 +1,4 @@
 
-            
 
         <!DOCTYPE html>
 <html lang="en">
@@ -8,6 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Hide topic form elements initially */
+        .topic-form-element {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <h1>Homepage</h1>
@@ -24,10 +29,23 @@
             <span class="close" onclick="closeCreateTopicPopup()">&times;</span>
             <h2>Create New Topic</h2>
             <form id="topic-form">
-                <input type="text" id="topic-title" placeholder="Enter topic title" required>
-                <input type="text" id="topic-description" placeholder="Enter topic description" required>
-                <input type="text" id="topic-tags" placeholder="Enter topic tags (comma-separated)">
-                <button type="submit">Create Topic</button>
+                <!-- Topic Title -->
+                <div class="topic-form-element">
+                    <label for="topic-title">Enter topic title:</label><br>
+                    <input type="text" id="topic-title" required><br><br>
+                </div>
+                <!-- Topic Description -->
+                <div class="topic-form-element">
+                    <label for="topic-description">Enter topic description:</label><br>
+                    <textarea id="topic-description" required></textarea><br><br>
+                </div>
+                <!-- Topic Tags -->
+                <div class="topic-form-element">
+                    <label for="topic-tags">Enter topic tags (comma-separated):</label><br>
+                    <input type="text" id="topic-tags"><br><br>
+                </div>
+                <!-- Create Topic Button -->
+                <button type="submit" class="topic-form-element">Create Topic</button>
             </form>
         </div>
     </div>
@@ -46,6 +64,7 @@
             messagingSenderId: "261987716644",
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
             measurementId: "G-YGQ1V6489M"
+     
         };
 
         // Initialize Firebase
@@ -99,6 +118,11 @@
         // Function to open the create topic popup
         function openCreateTopicPopup() {
             document.getElementById('create-topic-popup').style.display = 'block';
+            // Show topic form elements
+            const formElements = document.querySelectorAll('.topic-form-element');
+            formElements.forEach(element => {
+                element.style.display = 'block';
+            });
         }
 
         // Function to close the create topic popup
@@ -112,36 +136,39 @@
         const topicDescriptionInput = document.getElementById('topic-description');
         const topicTagsInput = document.getElementById('topic-tags');
 
-        topicForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission behavior
+        topicForm.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-            // Get the topic title, description, and tags
+            // Check if topic title and description are provided
             const title = topicTitleInput.value.trim();
             const description = topicDescriptionInput.value.trim();
-            const tags = topicTagsInput.value.trim().split(',').map(tag => tag.trim());
+            const tags = topicTagsInput.value.trim().split(',');
 
-            // Check if title and description are not empty
-            if (title && description) {
-                // Save the topic to the database
-                const newTopicRef = db.ref('topics').push();
-                newTopicRef.set({
-                    title: title,
-                    description: description,
-                    tags: tags,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                }).then(() => {
-                    // Close the popup after successful submission
-                    closeCreateTopicPopup();
-                    // Clear the input fields after successful submission
-                    topicTitleInput.value = '';
-                    topicDescriptionInput.value = '';
-                    topicTagsInput.value = '';
-                }).catch((error) => {
-                    console.error('Error saving topic:', error);
-                });
-            } else {
+            if (!title || !description) {
                 alert('Please enter both topic title and description before submitting.');
+                return;
             }
+
+            // Create topic object
+            const newTopic = {
+                title: title,
+                description: description,
+                tags: tags
+            };
+
+            // Save topic to the database
+            db.ref('topics').push(newTopic)
+                .then(() => {
+                    console.log('New topic created successfully');
+                    // Hide the popup after successful creation
+                    closeCreateTopicPopup();
+                    // Refresh the page to display the new topic
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error creating new topic:', error);
+                    alert('Error creating new topic. Please try again.');
+                });
         });
     </script>
 </body>
