@@ -1,6 +1,7 @@
 
 
-        <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,16 +13,44 @@
         .topic-form-element {
             display: none;
         }
+
+        /* Fixed header style */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #333;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .fixed-header button {
+            margin-right: 10px;
+        }
+
+        /* Adjust main content padding to make space for fixed header */
+        body {
+            padding-top: 60px; /* Adjust as needed */
+        }
     </style>
 </head>
 <body>
+    <!-- Fixed header with buttons -->
+    <div class="fixed-header">
+        <button id="create-topic-button" onclick="openCreateTopicPopup()">Create Topic</button>
+        <button id="notification-button">Notification</button>
+        <button id="logout-button">Logout</button>
+    </div>
+
     <h1>Homepage</h1>
     <div id="loading" style="display: none;">Loading...</div>
     <div id="topics-list">
         <!-- Topics will be dynamically added here -->
     </div>
-
-    <button id="create-topic-button" onclick="openCreateTopicPopup()">Create New Topic</button>
 
     <!-- Create Topic Popup Form -->
     <div id="create-topic-popup" class="popup">
@@ -66,6 +95,121 @@
             measurementId: "G-YGQ1V6489M"
      
         };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        const db = firebase.database();
+        const topicsList = document.getElementById('topics-list');
+        const loadingIndicator = document.getElementById('loading');
+
+        // Show loading indicator
+        loadingIndicator.style.display = 'block';
+
+        // Function to format date
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Function to fetch and display topics from Realtime Database
+        db.ref('topics').once('value')
+            .then((snapshot) => {
+                // Hide loading indicator once data is fetched
+                loadingIndicator.style.display = 'none';
+                snapshot.forEach((childSnapshot) => {
+                    const topic = childSnapshot.val();
+                    const topicId = childSnapshot.key;
+                    const topicElement = document.createElement('div');
+                    topicElement.innerHTML = `
+                        <h2>${topic.title}</h2>
+                        <p>${topic.description}</p>
+                        <p><strong>Tags:</strong> ${topic.tags.join(', ')}</p>
+                        <button onclick="viewTopicDetails('${topicId}')">View Details</button>
+                        <hr>
+                    `;
+                    topicsList.appendChild(topicElement);
+                });
+            })
+            .catch((error) => {
+                console.error('Error fetching topics:', error);
+                // Hide loading indicator in case of error
+                loadingIndicator.style.display = 'none';
+            });
+
+        // Function to navigate to topic details page
+        function viewTopicDetails(topicId) {
+            // Redirect to topic details page with the selected topic ID
+            window.location.href = `topic_details.html?id=${topicId}`;
+        }
+
+        // Function to open the create topic popup
+        function openCreateTopicPopup() {
+            document.getElementById('create-topic-popup').style.display = 'block';
+            // Show topic form elements
+            const formElements = document.querySelectorAll('.topic-form-element');
+            formElements.forEach(element => {
+                element.style.display = 'block';
+            });
+        }
+
+        // Function to close the create topic popup
+        function closeCreateTopicPopup() {
+            document.getElementById('create-topic-popup').style.display = 'none';
+        }
+
+        // Function to handle topic creation
+        const topicForm = document.getElementById('topic-form');
+        const topicTitleInput = document.getElementById('topic-title');
+        const topicDescriptionInput = document.getElementById('topic-description');
+        const topicTagsInput = document.getElementById('topic-tags');
+
+        topicForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Check if topic title and description are provided
+            const title = topicTitleInput.value.trim();
+            const description = topicDescriptionInput.value.trim();
+            const tags = topicTagsInput.value.trim().split(',');
+
+            if (!title || !description) {
+                alert('Please enter both topic title and description before submitting.');
+                return;
+            }
+
+            // Create topic object
+            const newTopic = {
+                title: title,
+                description: description,
+                tags: tags
+            };
+
+            // Save topic to the database
+            db.ref('topics').push(newTopic)
+                .then(() => {
+                    console.log('New topic created successfully');
+                    // Hide the popup after successful creation
+                    closeCreateTopicPopup();
+                    // Refresh the page to display the new topic
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error creating new topic:', error);
+                    alert('Error creating new topic. Please try again.');
+                });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+            
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
