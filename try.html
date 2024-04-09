@@ -28,30 +28,27 @@
         // Show loading indicator
         loadingIndicator.style.display = 'block';
 
-        // Function to fetch and display topics from Realtime Database
-        db.ref('topics').once('value')
-            .then((snapshot) => {
-                // Hide loading indicator once data is fetched
-                loadingIndicator.style.display = 'none';
-                snapshot.forEach((childSnapshot) => {
-                    const topic = childSnapshot.val();
-                    const topicId = childSnapshot.key;
-                    const topicElement = document.createElement('div');
-                    topicElement.innerHTML = `
-                        <h2>${topic.titles}</h2>
-                        <p>${topic.description}</p>
-                        <p><strong>Tags:</strong> ${topic.tag}</p>
-                        <button onclick="viewTopicDetails('${topicId}')">View Details</button>
-                        <hr>
-                    `;
-                    topicsList.appendChild(topicElement);
-                });
-            })
-            .catch((error) => {
-                console.error('Error fetching topics:', error);
-                // Hide loading indicator in case of error
-                loadingIndicator.style.display = 'none';
-            });
+// Function to fetch and display topics from Realtime Database
+db.ref('topics').once('value')
+    .then((snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            const topic = childSnapshot.val();
+            const topicId = childSnapshot.key;
+            const topicElement = document.createElement('div');
+            topicElement.innerHTML = `
+                <h2>${topic.titles}</h2>
+                <p>${topic.description}</p>
+                <p><strong>Tags:</strong> ${topic.tag}</p>
+                <button onclick="viewTopicDetails('${topicId}')">View Details</button>
+                <hr>
+            `;
+            document.getElementById('topics-list').appendChild(topicElement);
+        });
+    })
+    .catch((error) => {
+        console.error('Error fetching topics:', error);
+    });
+
 
         // Function to navigate to topic details page
         function viewTopicDetails(topicId) {
