@@ -1,6 +1,4 @@
-
-            
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,9 +22,26 @@
             padding: 5px 10px;
             cursor: pointer;
         }
+        /* Additional style for form */
+        #post-form {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
+    <!-- Post Creation Form -->
+    <h1>Create New Post</h1>
+    <form id="post-form">
+        <label for="post-title">Title:</label><br>
+        <input type="text" id="post-title" name="post-title" required><br><br>
+        
+        <label for="post-content">Content:</label><br>
+        <textarea id="post-content" name="post-content" rows="4" required></textarea><br><br>
+        
+        <button type="submit">Create Post</button>
+    </form>
+
+    <!-- Topic Details -->
     <h1>Topic Details</h1>
     <div id="topic-details">
         <!-- Topic details will be dynamically added here -->
@@ -42,7 +57,8 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
+
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -100,6 +116,50 @@
             console.error('Topic ID not found in URL parameter!');
             alert('Topic ID not found in URL parameter.');
         }
+
+        // Function to handle post creation form submission
+        document.getElementById('post-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission behavior
+
+            // Get form values
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
+
+            // Check if the user is authenticated
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                console.error('User not authenticated!');
+                // Display error message to the user
+                alert('Please sign in to create a post.');
+                return;
+            }
+
+            // Create new post object
+            const newPostKey = db.ref().child('posts').push().key;
+            const newPost = {
+                id: newPostKey,
+                title: title,
+                content: content,
+                topicId: topicId,
+                authorId: user.uid,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            // Add the new post to Realtime Database
+            db.ref('posts/' + newPostKey).set(newPost)
+                .then(() => {
+                    console.log('New post created with key:', newPostKey);
+                    // Show success message
+                    alert('Post created successfully!');
+                    // Refresh the page to display the new post
+                    location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error adding post:', error);
+                    // Display error message to the user
+                    alert('Error creating post. Please try again.');
+                });
+        });
     </script>
 </body>
 </html>
