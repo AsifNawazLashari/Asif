@@ -23,6 +23,9 @@
             color: blue;
             cursor: pointer;
         }
+        .hide {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -105,11 +108,12 @@
                             <div class="post-meta">
                                 <span>${post.author}</span> | 
                                 <span>${formatTime(post.createdAt)}</span>
-                                <!-- Format time function to be implemented -->
                             </div>
                             <p class="post-content">${getShortenedContent(post.content)}</p>
-                            <span class="read-more" data-content="${post.content}">Read More...</span>
-                            <div class="post-bottom">
+                            <span class="read-more">Read More...</span>
+                            <div class="post-bottom hide">
+                                <p>${post.content}</p>
+                                <button class="hide-button">Hide</button>
                                 <button class="like-button">Like</button>
                                 <button class="comment-button">Comment</button>
                             </div>
@@ -141,8 +145,16 @@
         // Event listener to expand post content when "Read More..." is clicked
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('read-more')) {
-                const content = event.target.dataset.content;
-                event.target.parentElement.innerHTML = content;
+                const postBottom = event.target.nextElementSibling;
+                postBottom.classList.remove('hide');
+            }
+        });
+
+        // Event listener to hide post content when "Hide" button is clicked
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('hide-button')) {
+                const postBottom = event.target.parentElement;
+                postBottom.classList.add('hide');
             }
         });
     </script>
