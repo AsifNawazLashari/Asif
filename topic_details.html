@@ -103,63 +103,98 @@
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
-            authDomain: "alif-ac574.firebaseapp.com",
-            projectId: "alif-ac574",
-            storageBucket: "alif-ac574.appspot.com",
-            messagingSenderId: "261987716644",
-            appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
-            measurementId: "G-YGQ1V6489M"
-        };
+            // Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
+  authDomain: "alif-ac574.firebaseapp.com",
+  databaseURL: "https://alif-ac574-default-rtdb.firebaseio.com",
+  projectId: "alif-ac574",
+  storageBucket: "alif-ac574.appspot.com",
+  messagingSenderId: "261987716644",
+  appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
+  measurementId: "G-YGQ1V6489M"
+};
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
-        const db = firebase.database();
+const db = firebase.database();
+const storage = firebase.storage(); // Reference to Firebase Storage
 
-        // Function to extract topic ID from URL parameter
-        function getTopicIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id');
-        }
+// Function to extract topic ID from URL parameter
+function getTopicIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+}
 
-        // Retrieve and display topic details
-        const topicId = getTopicIdFromUrl();
-        if (topicId) {
-            // Code to fetch and display topic details
-            // For simplicity, let's assume the topic name is fetched from the database
-            const topicName = "Sample Topic"; // Replace with actual topic name
-            document.getElementById('topic-name').textContent = topicName;
+// Retrieve and display topic details
+const topicId = getTopicIdFromUrl();
+if (topicId) {
+    // Code to fetch and display topic details
+    // For simplicity, let's assume the topic name is fetched from the database
+    const topicName = "Sample Topic"; // Replace with actual topic name
+    document.getElementById('topic-name').textContent = topicName;
 
-            // Retrieve and display posts associated with the topic
-            db.ref('posts').orderByChild('topicId').equalTo(topicId).once('value')
-                .then((snapshot) => {
-                    snapshot.forEach((childSnapshot) => {
-                        const post = childSnapshot.val();
-                        const postElement = document.createElement('div');
-                        postElement.classList.add('post');
-                        postElement.innerHTML = `
-                            <h2>${post.title}</h2>
-                            <div class="post-meta">
-                                <span>${post.author}</span> | 
-                                <span>${formatTime(post.createdAt)}</span>
-                            </div>
-                            <p class="post-content">${getShortenedContent(post.content)}</p>
-                            <span class="read-more" data-post-id="${post.id}">Read More...</span>
-                            <div class="full-post hide" id="post-${post.id}">
-                                <!-- Full post content will be dynamically added here -->
-                            </div>
-                            <hr>
-                        `;
-                        document.getElementById('posts-list').appendChild(postElement);
-                    });
+    // Retrieve and display posts associated with the topic
+    db.ref('posts').orderByChild('topicId').equalTo(topicId).once('value')
+        .then((snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                const post = childSnapshot.val();
+                const postId = childSnapshot.key;
+                const postElement = document.createElement('div');
+                postElement.classList.add('post');
+                postElement.innerHTML = `
+                    <h2>${post.title}</h2>
+                    <div class="post-meta">
+                        <span>${post.author}</span> | 
+                        <span>${formatTime(post.createdAt)}</span>
+                    </div>
+                    <p class="post-content">${getShortenedContent(post.content)}</p>
+                    <span class="read-more" data-post-id="${postId}">Read More...</span>
+                    <div class="full-post hide" id="post-${postId}">
+                        <!-- Full post content will be dynamically added here -->
+                    </div>
+                    <hr>
+                `;
+                document.getElementById('posts-list').appendChild(postElement);
+
+                // Fetch and display text content for each post
+                fetchTextContent(postId);
+            });
+        })
+        .catch((error) => {
+            console.error('Error fetching posts:', error);
+        });
+} else {
+    console.error('Topic ID not found in URL parameter!');
+    alert('Topic ID not found in URL parameter.');
+}
+
+// Function to fetch text content from Firebase Storage
+function fetchTextContent(postId) {
+    // Reference to the text file in Firebase Storage
+    const textRef = storage.ref().child(`text-files/${postId}.txt`);
+
+    // Get the download URL for the text file
+    textRef.getDownloadURL()
+        .then((url) => {
+            // Fetch the text content using the download URL
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    // Display the text content in the post element
+                    const fullPostElement = document.getElementById(`post-${postId}`);
+                    fullPostElement.innerHTML = `<p>${data}</p>`;
                 })
-                .catch((error) => {
-                    console.error('Error fetching posts:', error);
+                .catch(error => {
+                    console.error('Error fetching text content:', error);
                 });
-        } else {
-            console.error('Topic ID not found in URL parameter!');
-            alert('Topic ID not found in URL parameter.');
-        }
+        })
+        .catch(error => {
+            console.error('Error getting download URL:', error);
+        });
+}
+
 
         // Function to format time (e.g., Today, Yesterday, Just Now, 1 year ago, etc.)
         function formatTime(timestamp) {
