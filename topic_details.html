@@ -15,23 +15,31 @@
             font-size: smaller;
             color: #888;
         }
-        .comment-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
+        .post-content {
+            color: #888;
+            margin-bottom: 10px;
         }
-        /* Additional style for form */
-        #post-form {
-            margin-bottom: 20px;
+        .read-more {
+            color: blue;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <header>
+        <!-- Content buttons (Create new post, Notifications, Logout, Topics, Home) -->
+        <!-- Replace these placeholders with actual buttons -->
+        <button>Create New Post</button>
+        <button>Notifications</button>
+        <button>Logout</button>
+        <button>Topics</button>
+        <button>Home</button>
+    </header>
+
     <!-- Post Creation Form -->
-    <h1>Create New Post</h1>
-    <form id="post-form">
+    <!-- Form is hidden initially and shown when the "Create New Post" button is clicked -->
+    <form id="post-form" style="display: none;">
         <label for="post-title">Title:</label><br>
         <input type="text" id="post-title" name="post-title" required><br><br>
         
@@ -41,18 +49,13 @@
         <button type="submit">Create Post</button>
     </form>
 
-    <!-- Topic Details -->
-    <h1>Topic Details</h1>
-    <div id="topic-details">
-        <!-- Topic details will be dynamically added here -->
-    </div>
+    <!-- Actual Topic Name -->
+    <h1 id="topic-name">Topic Name</h1>
 
-    <h2>Posts</h2>
+    <!-- Posts -->
     <div id="posts-list">
         <!-- Posts associated with the topic will be dynamically added here -->
     </div>
-
-    <a href="index.html">Back to Homepage</a>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
@@ -86,7 +89,9 @@
         const topicId = getTopicIdFromUrl();
         if (topicId) {
             // Code to fetch and display topic details
-            // ...
+            // For simplicity, let's assume the topic name is fetched from the database
+            const topicName = "Sample Topic"; // Replace with actual topic name
+            document.getElementById('topic-name').textContent = topicName;
 
             // Retrieve and display posts associated with the topic
             db.ref('posts').orderByChild('topicId').equalTo(topicId).once('value')
@@ -96,14 +101,18 @@
                         const postElement = document.createElement('div');
                         postElement.classList.add('post');
                         postElement.innerHTML = `
-                            <h3>${post.title}</h3>
-                            <p>${post.content}</p>
+                            <h2>${post.title}</h2>
                             <div class="post-meta">
                                 <span>${post.author}</span> | 
-                                <span>${post.createdAt}</span>
+                                <span>${formatTime(post.createdAt)}</span>
+                                <!-- Format time function to be implemented -->
                             </div>
-                            <button class="comment-button">Comment</button>
-                            <button class="vote-button">Vote</button>
+                            <p class="post-content">${getShortenedContent(post.content)}</p>
+                            <span class="read-more" data-content="${post.content}">Read More...</span>
+                            <div class="post-bottom">
+                                <button class="like-button">Like</button>
+                                <button class="comment-button">Comment</button>
+                            </div>
                             <hr>
                         `;
                         document.getElementById('posts-list').appendChild(postElement);
@@ -117,48 +126,24 @@
             alert('Topic ID not found in URL parameter.');
         }
 
-        // Function to handle post creation form submission
-        document.getElementById('post-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission behavior
+        // Function to format time (e.g., Today, Yesterday, Just Now, 1 year ago, etc.)
+        function formatTime(timestamp) {
+            // To be implemented
+            // Return formatted time string based on the timestamp
+        }
 
-            // Get form values
-            const title = document.getElementById('post-title').value;
-            const content = document.getElementById('post-content').value;
+        // Function to get shortened content with "Read More..."
+        function getShortenedContent(content) {
+            // To be implemented
+            // Return the first line of content with "Read More..." appended
+        }
 
-            // Check if the user is authenticated
-            const user = firebase.auth().currentUser;
-            if (!user) {
-                console.error('User not authenticated!');
-                // Display error message to the user
-                alert('Please sign in to create a post.');
-                return;
+        // Event listener to expand post content when "Read More..." is clicked
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('read-more')) {
+                const content = event.target.dataset.content;
+                event.target.parentElement.innerHTML = content;
             }
-
-            // Create new post object
-            const newPostKey = db.ref().child('posts').push().key;
-            const newPost = {
-                id: newPostKey,
-                title: title,
-                content: content,
-                topicId: topicId,
-                authorId: user.uid,
-                createdAt: firebase.database.ServerValue.TIMESTAMP
-            };
-
-            // Add the new post to Realtime Database
-            db.ref('posts/' + newPostKey).set(newPost)
-                .then(() => {
-                    console.log('New post created with key:', newPostKey);
-                    // Show success message
-                    alert('Post created successfully!');
-                    // Refresh the page to display the new post
-                    location.reload();
-                })
-                .catch((error) => {
-                    console.error('Error adding post:', error);
-                    // Display error message to the user
-                    alert('Error creating post. Please try again.');
-                });
         });
     </script>
 </body>
