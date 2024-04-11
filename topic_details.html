@@ -5,19 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Topic Details</title>
     <style>
-        /* Other styles */
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header a {
+            color: white;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .icon-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            font-size: 20px;
+            color: white;
+        }
+        .icon-button:hover {
+            color: #ccc;
+        }
         .post {
+            background-color: white;
             border: 1px solid #ccc;
             margin-bottom: 20px;
-            padding: 10px;
+            padding: 20px;
         }
         .post-meta {
             font-size: smaller;
             color: #888;
         }
         .post-content {
-            color: #888;
-            margin-bottom: 10px;
+            color: #333;
+            margin-bottom: 20px;
         }
         .read-more {
             color: blue;
@@ -29,15 +60,13 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header with icon buttons -->
     <header>
-        <!-- Content buttons (Create new post, Notifications, Logout, Topics, Home) -->
-        <!-- Replace these placeholders with actual buttons -->
-        <button>Create New Post</button>
-        <button>Notifications</button>
-        <button>Logout</button>
-        <button>Topics</button>
-        <button>Home</button>
+        <a href="#"><img src="https://image.flaticon.com/icons/png/128/66/66453.png" alt="Home" class="icon-button"></a>
+        <a href="#"><img src="https://image.flaticon.com/icons/png/128/61/61109.png" alt="Topics" class="icon-button"></a>
+        <button id="create-post-button" class="icon-button"><img src="https://image.flaticon.com/icons/png/128/61/61456.png" alt="Create Post"></button>
+        <a href="#"><img src="https://image.flaticon.com/icons/png/128/109/109674.png" alt="Notifications" class="icon-button"></a>
+        <a href="#"><img src="https://image.flaticon.com/icons/png/128/126/126467.png" alt="Logout" class="icon-button"></a>
     </header>
 
     <!-- Post Creation Form -->
@@ -113,9 +142,9 @@
                             <span class="read-more">Read More...</span>
                             <div class="post-bottom hide">
                                 <p>${post.content}</p>
-                                <button class="hide-button">Hide</button>
-                                <button class="like-button">Like</button>
-                                <button class="comment-button">Comment</button>
+                                <button class="hide-button icon-button"><img src="https://image.flaticon.com/icons/png/128/66/66205.png" alt="Hide"></button>
+                                <button class="like-button icon-button"><img src="https://image.flaticon.com/icons/png/128/149/149217.png" alt="Like"></button>
+                                <button class="comment-button icon-button"><img src="https://image.flaticon.com/icons/png/128/26/26038.png" alt="Comment"></button>
                             </div>
                             <hr>
                         `;
@@ -156,6 +185,11 @@
                 const postBottom = event.target.parentElement;
                 postBottom.classList.add('hide');
             }
+        });
+
+        // Event listener to show post creation form when "Create New Post" button is clicked
+        document.getElementById('create-post-button').addEventListener('click', function(event) {
+            document.getElementById('post-form').style.display = 'block';
         });
     </script>
 </body>
