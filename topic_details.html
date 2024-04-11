@@ -139,8 +139,8 @@
                                 <span>${formatTime(post.createdAt)}</span>
                             </div>
                             <p class="post-content">${getShortenedContent(post.content)}</p>
-                            <span class="read-more">Read More...</span>
-                            <div class="post-bottom hide">
+                            <span class="read-more" data-post-id="${post.id}">Read More...</span>
+                            <div class="post-bottom hide" data-post-id="${post.id}">
                                 <p>${post.content}</p>
                                 <button class="hide-button icon-button"><img src="https://image.flaticon.com/icons/png/128/66/66205.png" alt="Hide"></button>
                                 <button class="like-button icon-button"><img src="https://image.flaticon.com/icons/png/128/149/149217.png" alt="Like"></button>
@@ -174,7 +174,8 @@
         // Event listener to expand post content when "Read More..." is clicked
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('read-more')) {
-                const postBottom = event.target.nextElementSibling;
+                const postId = event.target.dataset.postId;
+                const postBottom = document.querySelector(`.post-bottom[data-post-id="${postId}"]`);
                 postBottom.classList.remove('hide');
             }
         });
@@ -182,7 +183,8 @@
         // Event listener to hide post content when "Hide" button is clicked
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('hide-button')) {
-                const postBottom = event.target.parentElement;
+                const postId = event.target.parentElement.dataset.postId;
+                const postBottom = document.querySelector(`.post-bottom[data-post-id="${postId}"]`);
                 postBottom.classList.add('hide');
             }
         });
