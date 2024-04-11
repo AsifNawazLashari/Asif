@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -203,7 +205,49 @@
         document.getElementById('create-post-button').addEventListener('click', function(event) {
             document.getElementById('post-form').style.display = 'block';
         });
+
+        // Event listener for submitting the post creation form
+        document.getElementById('post-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get form values
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
+
+            // Upload the text to Firebase Storage
+            uploadTextToStorage(title, content);
+        });
+
+        // Function to upload text to Firebase Storage
+        function uploadTextToStorage(title, content) {
+            const text = `${title}\n${content}`;
+
+            if (text.length <= 5000) {
+                // Text is within the allowed limit
+                // Specify the path where the text will be stored in Firebase Storage
+                const storageRef = firebase.storage().ref().child('text-files/text.txt');
+
+                // Upload the text to Firebase Storage
+                storageRef.putString(text)
+                    .then(snapshot => {
+                        console.log('Text uploaded successfully');
+                        // Show success message
+                        alert('Text uploaded successfully!');
+                    })
+                    .catch(error => {
+                        console.error('Error uploading text:', error);
+                        // Show error message
+                        alert('Error uploading text. Please try again.');
+                    });
+            } else {
+                // Text exceeds the allowed limit
+                console.error('Text exceeds the maximum allowed limit of 5000 characters');
+                // Show error message
+                alert('Text exceeds the maximum allowed limit of 5000 characters');
+            }
+        }
     </script>
 </body>
-    </html>
-    
+</html>
+
+        
