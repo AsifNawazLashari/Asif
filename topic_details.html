@@ -17,7 +17,7 @@
             color: white;
             padding: 10px;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
         }
         header a {
@@ -69,16 +69,15 @@
         .like-comment button {
             margin-right: 10px;
         }
+        #create-post-button {
+            margin-left: auto;
+        }
     </style>
 </head>
 <body>
     <!-- Header with icon buttons -->
     <header>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/66/66453.png" alt="Home" class="icon-button"></a>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/61/61109.png" alt="Topics" class="icon-button"></a>
-        <button id="create-post-button" class="icon-button"><img src="https://image.flaticon.com/icons/png/128/61/61456.png" alt="Create Post"></button>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/109/109674.png" alt="Notifications" class="icon-button"></a>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/126/126467.png" alt="Logout" class="icon-button"></a>
+        <a href="index.html">Home</a>
     </header>
 
     <!-- Post Creation Form -->
@@ -113,7 +112,7 @@
             storageBucket: "alif-ac574.appspot.com",
             messagingSenderId: "261987716644",
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
-            measurementId: "G-YGQ1V6489M"
+            measurementId: "G-YGQ1V6489M" 
         };
 
         // Initialize Firebase
@@ -210,6 +209,46 @@
             // You can implement the comment functionality here
             alert('Commented!');
         }
+
+        // Event listener to show post creation form when "Create New Post" button is clicked
+        document.getElementById('create-post-button').addEventListener('click', function(event) {
+            document.getElementById('post-form').style.display = 'block';
+        });
+
+        // Event listener for submitting the post creation form
+        document.getElementById('post-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get form values
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
+
+            // Create a new post object
+            const newPost = {
+                authorId: "YOUR_AUTHOR_ID", // Replace with actual author ID
+                content: content,
+                createdAt: Date.now(),
+                title: title,
+                topicId: topicId
+            };
+
+            // Save the new post to the database
+            const newPostRef = db.ref('posts').push();
+            newPostRef.set(newPost)
+                .then(() => {
+                    console.log('New post added successfully');
+                    // Reset the form and hide it
+                    document.getElementById('post-form').reset();
+                    document.getElementById('post-form').style.display = 'none';
+                    // Reload the page to display the new post
+                    location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error adding new post:', error);
+                    // Show error message
+                    alert('Error adding new post. Please try again.');
+                });
+        });
     </script>
 </body>
 </html>
