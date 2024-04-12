@@ -1,41 +1,82 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Topic Details</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Reference to external CSS file -->
+    <title>Homepage</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Hide topic form elements initially */
+        .topic-form-element {
+            display: none;
+        }
+        /* Fixed header style */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #333;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+        }
+        .fixed-header button {
+            margin-right: 10px;
+        }
+        /* Adjust main content padding to make space for fixed header */
+        body {
+            padding-top: 60px; /* Adjust as needed */
+        }
+        /* Style for posts */
+        .post {
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header with icon buttons -->
-    <header>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/66/66453.png" alt="Home" class="icon-button"></a>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/61/61109.png" alt="Topics" class="icon-button"></a>
-        <button id="create-post-button" class="icon-button"><img src="https://image.flaticon.com/icons/png/128/61/61456.png" alt="Create Post"></button>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/109/109674.png" alt="Notifications" class="icon-button"></a>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/126/126467.png" alt="Logout" class="icon-button"></a>
-    </header>
-
-    <!-- Post Creation Form -->
-    <!-- Form is hidden initially and shown when the "Create New Post" button is clicked -->
-    <form id="post-form" style="display: none;">
-        <label for="post-title">Title:</label><br>
-        <input type="text" id="post-title" name="post-title" required><br><br>
-        
-        <label for="post-content">Content:</label><br>
-        <textarea id="post-content" name="post-content" rows="1" placeholder="What's on your mind?"></textarea><br><br>
-        
-        <button type="submit">Post</button>
-    </form>
-
-    <!-- Actual Topic Name -->
-    <h1 id="topic-name">Topic Name</h1>
-
-    <!-- Posts -->
-    <div id="posts-list">
-        <!-- Posts associated with the topic will be dynamically added here -->
+    <!-- Fixed header with buttons -->
+    <div class="fixed-header">
+        <button id="create-topic-button" onclick="openCreateTopicPopup()">Create Topic</button>
+        <button id="notification-button">Notification</button>
+        <button id="logout-button">Logout</button>
     </div>
-
+    <h1>Homepage</h1>
+    <div id="loading" style="display: none;">Loading...</div>
+    <div id="content">
+        <!-- Content will be dynamically added here -->
+    </div>
+    <!-- Create Topic Popup Form -->
+    <div id="create-topic-popup" class="popup" style="display: none;">
+        <div class="popup-content">
+            <span class="close" onclick="closeCreateTopicPopup()">&times;</span>
+            <h2>Create New Topic</h2>
+            <form id="topic-form">
+                <!-- Topic Title -->
+                <div class="topic-form-element">
+                    <label for="topic-title">Enter topic title:</label><br>
+                    <input type="text" id="topic-title" required><br><br>
+                </div>
+                <!-- Topic Description -->
+                <div class="topic-form-element">
+                    <label for="topic-description">Enter topic description:</label><br>
+                    <textarea id="topic-description" required></textarea><br><br>
+                </div>
+                <!-- Topic Tags -->
+                <div class="topic-form-element">
+                    <label for="topic-tags">Enter topic tags (comma-separated):</label><br>
+                    <input type="text" id="topic-tags"><br><br>
+                </div>
+                <!-- Create Topic Button -->
+                <button type="submit" class="topic-form-element">Create Topic</button>
+            </form>
+        </div>
+    </div>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
@@ -50,27 +91,50 @@
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
             measurementId: "G-YGQ1V6489M"
         };
-
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-
         const db = firebase.database();
-
-        // Function to extract topic ID from URL parameter
-        function getTopicIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id');
+        const content = document.getElementById('content');
+        const loadingIndicator = document.getElementById('loading');
+        // Show loading indicator
+        loadingIndicator.style.display = 'block';
+        // Function to format date
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
         }
+        // Function to fetch and display topics from Realtime Database
+        db.ref('topics').once('value')
+            .then((snapshot) => {
+                // Hide loading indicator once data is fetched
+                loadingIndicator.style.display = 'none';
+                snapshot.forEach((childSnapshot) => {
+                    const topic = childSnapshot.val();
+                    const topicId = childSnapshot.key;
+                    const topicElement = document.createElement('div');
+                    topicElement.innerHTML = `
+                        <h2>${topic.title}</h2>
+                        <p>${topic.description}</p>
+                        <p><strong>Tags:</strong> ${topic.tags.join(', ')}</p>
+                        <button onclick="viewTopicDetails('${topicId}')">View Details</button>
+                        <hr>
+                    `;
+                    content.appendChild(topicElement);
+                });
+            })
+            .catch((error) => {
+                console.error('Error fetching topics:', error);
+                // Hide loading indicator in case of error
+                loadingIndicator.style.display = 'none';
+            });
 
-        // Retrieve and display topic details
-        const topicId = getTopicIdFromUrl();
-        if (topicId) {
-            // Code to fetch and display topic details
-            // For simplicity, let's assume the topic name is fetched from the database
-            const topicName = "Sample Topic"; // Replace with actual topic name
-            document.getElementById('topic-name').textContent = topicName;
+        // Function to navigate to topic details page
+        function viewTopicDetails(topicId) {
+            // Clear previous content
+            content.innerHTML = '';
 
-            // Retrieve and display posts associated with the topic
+            // Fetch posts associated with the selected topic
             db.ref('posts').orderByChild('topicId').equalTo(topicId).once('value')
                 .then((snapshot) => {
                     snapshot.forEach((childSnapshot) => {
@@ -78,77 +142,33 @@
                         const postElement = document.createElement('div');
                         postElement.classList.add('post');
                         postElement.innerHTML = `
-                            <img src="sample_profile_picture.jpg" alt="Profile Picture" class="profile-picture">
-                            <h2>${post.title}</h2>
-                            <div class="post-meta">
-                                <span>${post.author}</span> | 
-                                <span>${formatTime(post.createdAt)}</span>
-                            </div>
-                            <p class="post-content">${post.content}</p>
+                            <h3>${post.title}</h3>
+                            <p>${post.content}</p>
+                            <p>Posted on: ${formatDate(post.createdAt)}</p>
                             <hr>
                         `;
-                        document.getElementById('posts-list').appendChild(postElement);
+                        content.appendChild(postElement);
                     });
                 })
                 .catch((error) => {
                     console.error('Error fetching posts:', error);
                 });
-        } else {
-            console.error('Topic ID not found in URL parameter!');
-            alert('Topic ID not found in URL parameter.');
+            window.location.href = `topic_details.html?id=${topicId}`;
         }
 
-        // Function to format time (e.g., Today, Yesterday, Just Now, 1 year ago, etc.)
-        function formatTime(timestamp) {
-            // To be implemented
-            // Return formatted time string based on the timestamp
+        // Function to open the create topic popup
+        function openCreateTopicPopup() {
+            document.getElementById('create-topic-popup').style.display = 'block';
+            // Show topic form elements
+            const formElements = document.querySelectorAll('.topic-form-element');
+            formElements.forEach(element => {
+                element.style.display = 'block';
+            });
         }
-
-        // Event listener to show post creation form when "Create New Post" button is clicked
-        document.getElementById('create-post-button').addEventListener('click', function(event) {
-            document.getElementById('post-form').style.display = 'block';
-        });
-
-        // Event listener for submitting the post creation form
-        document.getElementById('post-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
-
-            // Get form values
-            const title = document.getElementById('post-title').value;
-            const content = document.getElementById('post-content').value;
-
-            // Get current timestamp
-            const timestamp = new Date().toISOString();
-
-            // Generate a unique ID for the new post
-            const newPostKey = db.ref().child('posts').push().key;
-
-            // Create the new post object
-            const newPost = {
-                title: title,
-                content: content,
-                author: "John Doe", // Replace with actual author name or user ID
-                createdAt: timestamp,
-                topicId: topicId
-            };
-
-            // Save the new post in the database
-            db.ref('posts/' + newPostKey).set(newPost)
-                .then(() => {
-                    console.log('New post added successfully');
-                    // Hide the post creation form
-                    document.getElementById('post-form').style.display = 'none';
-                    // Clear the form fields
-                    document.getElementById('post-title').value = '';
-                    document.getElementById('post-content').value = '';
-                    // Refresh the page to display the new post
-                    location.reload();
-                })
-                .catch((error) => {
-                    console.error('Error adding new post:', error);
-                    alert('Error adding new post. Please try again.');
-                });
-        });
+        // Function to close the create topic popup
+        function closeCreateTopicPopup() {
+            document.getElementById('create-topic-popup').style.display = 'none';
+        }
     </script>
 </body>
 </html>
