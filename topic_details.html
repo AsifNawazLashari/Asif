@@ -49,8 +49,6 @@
         .post-content {
             color: #333;
             margin-bottom: 20px;
-            max-height: 100px; /* Max height of two lines */
-            overflow: hidden;
         }
         .read-more {
             color: blue;
@@ -138,15 +136,6 @@
                     const post = childSnapshot.val();
                     const postElement = document.createElement('div');
                     postElement.classList.add('post');
-                    const content = post.content;
-                    let contentToShow = content;
-                    let showReadMore = true;
-                    if (content.length > 100) {
-                        contentToShow = content.slice(0, 100);
-                        showReadMore = true;
-                    } else {
-                        showReadMore = false;
-                    }
                     postElement.innerHTML = `
                         <img src="sample_profile_picture.jpg" alt="Profile Picture" class="profile-picture">
                         <h2>${post.title}</h2>
@@ -154,8 +143,8 @@
                             <span>${post.author}</span> | 
                             <span>${formatTime(post.createdAt)}</span>
                         </div>
-                        <p class="post-content">${contentToShow}</p>
-                        ${showReadMore ? `<p class="read-more" onclick="showFullContent(this)">Read More...</p>` : ''}
+                        <p class="post-content">${post.content}</p>
+                        <p class="read-more" onclick="togglePostContent(this)">Read More...</p>
                         <hr>
                         <button onclick="likePost('${childSnapshot.key}')">Like</button>
                         <button onclick="commentPost('${childSnapshot.key}')">Comment</button>
@@ -174,55 +163,16 @@
             // Return formatted time string based on the timestamp
         }
 
-        // Event listener to show post creation form when "Create New Post" button is clicked
-        document.getElementById('create-post-button').addEventListener('click', function(event) {
-            document.getElementById('post-form').style.display = 'block';
-        });
-
-        // Event listener for submitting the post creation form
-        document.getElementById('post-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
-
-            // Get form values
-            const title = document.getElementById('post-title').value;
-            const content = document.getElementById('post-content').value;
-
-            // Get current timestamp
-            const timestamp = new Date().toISOString();
-
-            // Generate a unique ID for the new post
-            const newPostKey = db.ref().child('posts').push().key;
-
-            // Create the new post object
-            const newPost = {
-                title: title,
-                content: content,
-                author: "John Doe", // Replace with actual author name or user ID
-                createdAt: timestamp,
-                topicId: topicId
-            };
-
-            // Save the new post in the database
-            db.ref('posts/' + newPostKey).set(newPost)
-                .then(() => {
-                    console.log('New post added successfully');
-                    // Hide the post creation form
-                    document.getElementById('post-form').style.display = 'none';
-                    // Clear the form fields
-                    document.getElementById('post-title').value = '';
-                    document.getElementById('post-content').value = '';
-                })
-                .catch((error) => {
-                    console.error('Error adding new post:', error);
-                    alert('Error adding new post. Please try again.');
-                });
-        });
-
-        // Function to show full content of the post
-        function showFullContent(element) {
+        // Function to toggle post content visibility
+        function togglePostContent(element) {
             const postContent = element.previousSibling;
-            postContent.classList.remove('hide');
-            element.classList.add('hide');
+            if (postContent.classList.contains('hide')) {
+                postContent.classList.remove('hide');
+                element.textContent = 'Hide';
+            } else {
+                postContent.classList.add('hide');
+                element.textContent = 'Read More...';
+            }
         }
 
         // Function to like a post
