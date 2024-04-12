@@ -17,7 +17,7 @@
             color: white;
             padding: 10px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
         }
         header a {
@@ -57,31 +57,20 @@
         .hide {
             display: none;
         }
-        .profile-picture {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-        .like-comment {
-            margin-top: 10px;
-        }
-        .like-comment button {
-            margin-right: 10px;
-        }
-        #create-post-button {
-            margin-left: auto;
-        }
     </style>
 </head>
 <body>
     <!-- Header with icon buttons -->
     <header>
         <a href="index.html">Home</a>
+        <a href="topics.html">Topics</a>
+        <button id="create-post-button" class="icon-button">Create Post</button>
+        <a href="#">Notifications</a>
+        <a href="#">Logout</a>
     </header>
 
     <!-- Post Creation Form -->
-    <!-- Form is hidden initially and shown when the "Create New Post" button is clicked -->
+    <!-- Form is hidden initially and shown when the "Create Post" button is clicked -->
     <form id="post-form" style="display: none;">
         <label for="post-title">Title:</label><br>
         <input type="text" id="post-title" name="post-title" required><br><br>
@@ -103,6 +92,8 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
+
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -112,7 +103,7 @@
             storageBucket: "alif-ac574.appspot.com",
             messagingSenderId: "261987716644",
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
-            measurementId: "G-YGQ1V6489M" 
+            measurementId: "G-YGQ1V6489M"
         };
 
         // Initialize Firebase
@@ -142,21 +133,15 @@
                         const postElement = document.createElement('div');
                         postElement.classList.add('post');
                         postElement.innerHTML = `
-                            <img src="sample_profile_picture.jpg" alt="Profile Picture" class="profile-picture">
                             <h2>${post.title}</h2>
                             <div class="post-meta">
-                                <span>${post.authorId}</span> | 
+                                <span>${post.author}</span> | 
                                 <span>${formatTime(post.createdAt)}</span>
                             </div>
                             <p class="post-content">${getShortenedContent(post.content)}</p>
-                            <span class="read-more" data-post-id="${childSnapshot.key}">Read More...</span>
-                            <div class="full-post hide" id="post-${childSnapshot.key}">
+                            <span class="read-more" data-post-id="${post.id}">Read More...</span>
+                            <div class="full-post hide" id="post-${post.id}">
                                 <!-- Full post content will be dynamically added here -->
-                                <p>${post.content}</p>
-                                <div class="like-comment">
-                                    <button onclick="likePost('${childSnapshot.key}')">Like</button>
-                                    <button onclick="commentPost('${childSnapshot.key}')">Comment</button>
-                                </div>
                             </div>
                             <hr>
                         `;
@@ -179,13 +164,8 @@
 
         // Function to get shortened content with "Read More..."
         function getShortenedContent(content) {
-            // Get the first line of content
-            const firstLine = content.split('\n')[0];
-            if (firstLine.length > 50) {
-                // If the first line is too long, truncate it
-                return firstLine.substring(0, 50) + '...';
-            }
-            return firstLine;
+            // To be implemented
+            // Return the first line of content with "Read More..." appended
         }
 
         // Event listener to expand post content when "Read More..." is clicked
@@ -193,21 +173,30 @@
             if (event.target.classList.contains('read-more')) {
                 const postId = event.target.dataset.postId;
                 const fullPost = document.getElementById(`post-${postId}`);
-                fullPost.classList.toggle('hide');
-                event.target.textContent = fullPost.classList.contains('hide') ? 'Read More...' : 'Hide';
+                if (fullPost.innerHTML === '') {
+                    // Fetch the full post content via AJAX
+                    fetchPostContent(postId, fullPost);
+                } else {
+                    fullPost.classList.toggle('hide');
+                }
             }
         });
 
-        // Function to handle liking a post
-        function likePost(postId) {
-            // You can implement the like functionality here
-            alert('Liked!');
-        }
-
-        // Function to handle commenting on a post
-        function commentPost(postId) {
-            // You can implement the comment functionality here
-            alert('Commented!');
+        // Function to fetch full post content via AJAX
+        function fetchPostContent(postId, container) {
+            // Make AJAX request to fetch full post content from the server
+            // For demonstration purposes, let's assume the content is fetched from a server-side endpoint
+            fetch(`/api/posts/${postId}`)
+                .then(response => response.text())
+                .then(data => {
+                    // Populate the container with the fetched content
+                    container.innerHTML = `<p>${data}</p>`;
+                    // Show the container
+                    container.classList.remove('hide');
+                })
+                .catch(error => {
+                    console.error('Error fetching post content:', error);
+                });
         }
 
         // Event listener to show post creation form when "Create New Post" button is clicked
@@ -223,32 +212,43 @@
             const title = document.getElementById('post-title').value;
             const content = document.getElementById('post-content').value;
 
-            // Create a new post object
-            const newPost = {
-                authorId: "YOUR_AUTHOR_ID", // Replace with actual author ID
+            // Create a new post in the database
+            createNewPost(title, content);
+        });
+
+        // Function to create a new post in the database
+        function createNewPost(title, content) {
+            const author = "Sample Author"; // Replace with actual author
+            const createdAt = Date.now(); // Get current timestamp
+            const postId = db.ref('posts').push().key; // Generate a unique ID for the post
+
+            const postData = {
+                author: author,
                 content: content,
-                createdAt: Date.now(),
+                createdAt: createdAt,
+                id: postId,
                 title: title,
                 topicId: topicId
             };
 
-            // Save the new post to the database
-            const newPostRef = db.ref('posts').push();
-            newPostRef.set(newPost)
+            // Save the post data in the database
+            db.ref('posts/' + postId).set(postData)
                 .then(() => {
-                    console.log('New post added successfully');
-                    // Reset the form and hide it
-                    document.getElementById('post-form').reset();
+                    console.log('Post created successfully');
+                    // Show success message
+                    alert('Post created successfully!');
+                    // Clear the form
+                    document.getElementById('post-title').value = '';
+                    document.getElementById('post-content').value = '';
+                    // Hide the form
                     document.getElementById('post-form').style.display = 'none';
-                    // Reload the page to display the new post
-                    location.reload();
                 })
-                .catch((error) => {
-                    console.error('Error adding new post:', error);
+                .catch(error => {
+                    console.error('Error creating post:', error);
                     // Show error message
-                    alert('Error adding new post. Please try again.');
+                    alert('Error creating post. Please try again.');
                 });
-        });
+        }
     </script>
 </body>
 </html>
