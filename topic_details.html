@@ -49,6 +49,8 @@
         .post-content {
             color: #333;
             margin-bottom: 20px;
+            max-height: 100px; /* Max height of two lines */
+            overflow: hidden;
         }
         .read-more {
             color: blue;
@@ -130,28 +132,37 @@
             document.getElementById('topic-name').textContent = topicName;
 
             // Retrieve and display posts associated with the topic
-            db.ref('posts').orderByChild('topicId').equalTo(topicId).once('value')
-                .then((snapshot) => {
-                    snapshot.forEach((childSnapshot) => {
-                        const post = childSnapshot.val();
-                        const postElement = document.createElement('div');
-                        postElement.classList.add('post');
-                        postElement.innerHTML = `
-                            <img src="sample_profile_picture.jpg" alt="Profile Picture" class="profile-picture">
-                            <h2>${post.title}</h2>
-                            <div class="post-meta">
-                                <span>${post.author}</span> | 
-                                <span>${formatTime(post.createdAt)}</span>
-                            </div>
-                            <p class="post-content">${post.content}</p>
-                            <hr>
-                        `;
-                        document.getElementById('posts-list').appendChild(postElement);
-                    });
-                })
-                .catch((error) => {
-                    console.error('Error fetching posts:', error);
+            db.ref('posts').orderByChild('topicId').equalTo(topicId).on('value', (snapshot) => {
+                document.getElementById('posts-list').innerHTML = ''; // Clear previous posts
+                snapshot.forEach((childSnapshot) => {
+                    const post = childSnapshot.val();
+                    const postElement = document.createElement('div');
+                    postElement.classList.add('post');
+                    const content = post.content;
+                    let contentToShow = content;
+                    let showReadMore = true;
+                    if (content.length > 100) {
+                        contentToShow = content.slice(0, 100);
+                        showReadMore = true;
+                    } else {
+                        showReadMore = false;
+                    }
+                    postElement.innerHTML = `
+                        <img src="sample_profile_picture.jpg" alt="Profile Picture" class="profile-picture">
+                        <h2>${post.title}</h2>
+                        <div class="post-meta">
+                            <span>${post.author}</span> | 
+                            <span>${formatTime(post.createdAt)}</span>
+                        </div>
+                        <p class="post-content">${contentToShow}</p>
+                        ${showReadMore ? `<p class="read-more" onclick="showFullContent(this)">Read More...</p>` : ''}
+                        <hr>
+                        <button onclick="likePost('${childSnapshot.key}')">Like</button>
+                        <button onclick="commentPost('${childSnapshot.key}')">Comment</button>
+                    `;
+                    document.getElementById('posts-list').appendChild(postElement);
                 });
+            });
         } else {
             console.error('Topic ID not found in URL parameter!');
             alert('Topic ID not found in URL parameter.');
@@ -200,14 +211,31 @@
                     // Clear the form fields
                     document.getElementById('post-title').value = '';
                     document.getElementById('post-content').value = '';
-                    // Refresh the page to display the new post
-                    location.reload();
                 })
                 .catch((error) => {
                     console.error('Error adding new post:', error);
                     alert('Error adding new post. Please try again.');
                 });
         });
+
+        // Function to show full content of the post
+        function showFullContent(element) {
+            const postContent = element.previousSibling;
+            postContent.classList.remove('hide');
+            element.classList.add('hide');
+        }
+
+        // Function to like a post
+        function likePost(postId) {
+            // Logic to like the post and update the database
+            console.log("Liked post:", postId);
+        }
+
+        // Function to comment on a post
+        function commentPost(postId) {
+            // Logic to add a comment to the post and update the database
+            console.log("Commented on post:", postId);
+        }
     </script>
 </body>
 </html>
