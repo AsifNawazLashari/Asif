@@ -1,3 +1,15 @@
+       // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
+            authDomain: "alif-ac574.firebaseapp.com",
+            projectId: "alif-ac574",
+            storageBucket: "alif-ac574.appspot.com",
+            messagingSenderId: "261987716644",
+            appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
+            measurementId: "G-YGQ1V6489M"
+       
+        
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,6 +75,9 @@
             border-radius: 50%;
             margin-right: 10px;
         }
+        .details {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -107,7 +122,7 @@
             storageBucket: "alif-ac574.appspot.com",
             messagingSenderId: "261987716644",
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
-            measurementId: "G-YGQ1V6489M"
+            measurementId: "G-YGQ1V6489M""
         };
 
         // Initialize Firebase
@@ -143,8 +158,11 @@
                             <span>${post.author}</span> | 
                             <span>${formatTime(post.createdAt)}</span>
                         </div>
-                        <p class="post-content">${post.content}</p>
-                        <p class="read-more" onclick="togglePostContent(this)">Read More...</p>
+                        <p class="post-content">${truncateText(post.content)}</p>
+                        <p class="read-more" onclick="togglePostContent(this, '${post.content}')">Read More...</p>
+                        <div class="details hide">
+                            <!-- Additional details will be dynamically loaded here -->
+                        </div>
                         <hr>
                         <button onclick="likePost('${childSnapshot.key}')">Like</button>
                         <button onclick="commentPost('${childSnapshot.key}')">Comment</button>
@@ -163,16 +181,46 @@
             // Return formatted time string based on the timestamp
         }
 
+        // Function to truncate text and add "Read More..." link
+        function truncateText(text) {
+            const maxLength = 100; // Maximum length of truncated text
+            if (text.length > maxLength) {
+                return text.slice(0, maxLength) + '...';
+            } else {
+                return text;
+            }
+        }
+
         // Function to toggle post content visibility
-        function togglePostContent(element) {
+        function togglePostContent(element, fullContent) {
             const postContent = element.previousSibling;
+            const details = element.nextSibling;
             if (postContent.classList.contains('hide')) {
+                postContent.textContent = fullContent;
                 postContent.classList.remove('hide');
                 element.textContent = 'Hide';
+                loadPostDetails(details); // Load additional details
+                details.classList.remove('hide');
             } else {
+                postContent.textContent = truncateText(fullContent);
                 postContent.classList.add('hide');
                 element.textContent = 'Read More...';
+                details.classList.add('hide');
             }
+        }
+
+        // Function to load additional details of a post
+        function loadPostDetails(detailsElement) {
+            // Simulate loading of additional details (e.g., comments, likes) from the database
+            setTimeout(() => {
+                // Example additional details
+                detailsElement.innerHTML = `
+                    <p>Additional details:</p>
+                    <p>Comments: 5</p>
+                    <p>Likes: 10</p>
+                    <!-- Add more details as needed -->
+                `;
+            }, 1000); // Simulate 1 second delay for loading
         }
 
         // Function to like a post
