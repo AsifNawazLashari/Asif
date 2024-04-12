@@ -3,163 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golden Age of Islamics</title>
+    <title>Topic Details</title>
     <link rel="stylesheet" href="styles.css"> <!-- Reference to external CSS file -->
 </head>
 <body>
-    <!-- Header with background image -->
+    <!-- Header with icon buttons -->
     <header>
-        <div class="header-content">
-            <h1>Golden Age of Islamics</h1>
-            <button id="create-post-button">Create Post</button>
-        </div>
+        <a href="#"><img src="https://image.flaticon.com/icons/png/128/66/66453.png" alt="Home" class="icon-button"></a>
+        <a href="#"><img src="https://image.flaticon.com/icons/png/128/61/61109.png" alt="Topics" class="icon-button"></a>
+        <button id="create-post-button" class="icon-button"><img src="https://image.flaticon.com/icons/png/128/61/61456.png" alt="Create Post"></button>
+        <a href="#"><img src="https://image.flaticon.com/icons/png/128/109/109674.png" alt="Notifications" class="icon-button"></a>
+        <a href="#"><img src="https://image.flaticon.com/icons/png/128/126/126467.png" alt="Logout" class="icon-button"></a>
     </header>
 
-    <!-- Posting area -->
-    <section id="post-area">
-        <div class="post-input">
-            <input type="text" id="post-title" placeholder="Title">
-            <textarea id="post-content" placeholder="Share your thoughts..."></textarea>
-            <div class="formatting-options">
-                <!-- Add formatting options such as text highlighter, font styles, colors, etc. -->
-            </div>
-            <button id="post-button">Post</button>
-        </div>
-    </section>
+    <!-- Post Creation Form -->
+    <!-- Form is hidden initially and shown when the "Create New Post" button is clicked -->
+    <form id="post-form" style="display: none;">
+        <label for="post-title">Title:</label><br>
+        <input type="text" id="post-title" name="post-title" required><br><br>
+        
+        <label for="post-content">Content:</label><br>
+        <textarea id="post-content" name="post-content" rows="1" placeholder="What's on your mind?"></textarea><br><br>
+        
+        <button type="submit">Post</button>
+    </form>
 
-    <!-- Post layout resembling Quora -->
-    <section id="post-layout">
-        <!-- Sample post -->
-        <div class="post">
-            <div class="profile-picture">
-                <!-- Profile picture placeholder -->
-            </div>
-            <div class="post-details">
-                <p class="user-designation">User Designation</p>
-                <p class="post-time">March 30, 2024</p>
-                <h2 class="post-title">Post Title</h2>
-                <p class="post-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget pretium velit. Quisque non ultrices quam. Donec nec massa a nibh sodales facilisis.</p>
-                <button class="like-button">Like</button>
-                <button class="comment-button">Comment</button>
-            </div>
-        </div>
-        <!-- More posts will be dynamically added here -->
-    </section>
+    <!-- Actual Topic Name -->
+    <h1 id="topic-name">Topic Name</h1>
 
+    <!-- Posts -->
+    <div id="posts-list">
+        <!-- Posts associated with the topic will be dynamically added here -->
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
     <script>
-    // Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
             authDomain: "alif-ac574.firebaseapp.com",
             projectId: "alif-ac574",
             storageBucket: "alif-ac574.appspot.com",
             messagingSenderId: "261987716644",
             appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
             measurementId: "G-YGQ1V6489M"
-};
+        };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
 
-const db = firebase.database();
+        const db = firebase.database();
 
-// Function to extract topic ID from URL parameter
-function getTopicIdFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('id');
-}
+        // Function to extract topic ID from URL parameter
+        function getTopicIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
 
-// Retrieve and display topic details
-const topicId = getTopicIdFromUrl();
-if (topicId) {
-    // Code to fetch and display topic details
-    // For simplicity, let's assume the topic name is fetched from the database
-    const topicName = "Sample Topic"; // Replace with actual topic name
-    document.getElementById('topic-name').textContent = topicName;
+        // Retrieve and display topic details
+        const topicId = getTopicIdFromUrl();
+        if (topicId) {
+            // Code to fetch and display topic details
+            // For simplicity, let's assume the topic name is fetched from the database
+            const topicName = "Sample Topic"; // Replace with actual topic name
+            document.getElementById('topic-name').textContent = topicName;
 
-    // Retrieve and display posts associated with the topic
-    db.ref('posts').orderByChild('topicId').equalTo(topicId).once('value')
-        .then((snapshot) => {
-            snapshot.forEach((childSnapshot) => {
-                const post = childSnapshot.val();
-                const postElement = document.createElement('div');
-                postElement.classList.add('post');
-                postElement.innerHTML = `
-                    <div class="profile-picture"></div>
-                    <div class="post-details">
-                        <p class="user-designation">${post.author}</p>
-                        <p class="post-time">${formatTime(post.createdAt)}</p>
-                        <h2 class="post-title">${post.title}</h2>
-                        <p class="post-content">${post.content}</p>
-                        <button class="like-button">Like</button>
-                        <button class="comment-button">Comment</button>
-                    </div>
-                `;
-                document.getElementById('post-layout').appendChild(postElement);
-            });
-        })
-        .catch((error) => {
-            console.error('Error fetching posts:', error);
+            // Retrieve and display posts associated with the topic
+            db.ref('posts').orderByChild('topicId').equalTo(topicId).once('value')
+                .then((snapshot) => {
+                    snapshot.forEach((childSnapshot) => {
+                        const post = childSnapshot.val();
+                        const postElement = document.createElement('div');
+                        postElement.classList.add('post');
+                        postElement.innerHTML = `
+                            <img src="sample_profile_picture.jpg" alt="Profile Picture" class="profile-picture">
+                            <h2>${post.title}</h2>
+                            <div class="post-meta">
+                                <span>${post.author}</span> | 
+                                <span>${formatTime(post.createdAt)}</span>
+                            </div>
+                            <p class="post-content">${post.content}</p>
+                            <hr>
+                        `;
+                        document.getElementById('posts-list').appendChild(postElement);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error fetching posts:', error);
+                });
+        } else {
+            console.error('Topic ID not found in URL parameter!');
+            alert('Topic ID not found in URL parameter.');
+        }
+
+        // Function to format time (e.g., Today, Yesterday, Just Now, 1 year ago, etc.)
+        function formatTime(timestamp) {
+            // To be implemented
+            // Return formatted time string based on the timestamp
+        }
+
+        // Event listener to show post creation form when "Create New Post" button is clicked
+        document.getElementById('create-post-button').addEventListener('click', function(event) {
+            document.getElementById('post-form').style.display = 'block';
         });
-} else {
-    console.error('Topic ID not found in URL parameter!');
-    alert('Topic ID not found in URL parameter.');
-}
 
-// Function to format time (e.g., Today, Yesterday, Just Now, 1 year ago, etc.)
-function formatTime(timestamp) {
-    // To be implemented
-    // Return formatted time string based on the timestamp
-}
+        // Event listener for submitting the post creation form
+        document.getElementById('post-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
 
-// Event listener to show post creation form when "Create New Post" button is clicked
-document.getElementById('create-post-button').addEventListener('click', function(event) {
-    document.getElementById('post-form').style.display = 'block';
-});
+            // Get form values
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
 
-// Event listener for submitting the post creation form
-document.getElementById('post-button').addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent form submission
+            // Get current timestamp
+            const timestamp = new Date().toISOString();
 
-    // Get form values
-    const title = document.getElementById('post-title').value;
-    const content = document.getElementById('post-content').value;
+            // Generate a unique ID for the new post
+            const newPostKey = db.ref().child('posts').push().key;
 
-    // Get current timestamp
-    const timestamp = new Date().toISOString();
+            // Create the new post object
+            const newPost = {
+                title: title,
+                content: content,
+                author: "John Doe", // Replace with actual author name or user ID
+                createdAt: timestamp,
+                topicId: topicId
+            };
 
-    // Generate a unique ID for the new post
-    const newPostKey = db.ref().child('posts').push().key;
-
-    // Create the new post object
-    const newPost = {
-        title: title,
-        content: content,
-        author: "John Doe", // Replace with actual author name or user ID
-        createdAt: timestamp,
-        topicId: topicId
-    };
-
-    // Save the new post in the database
-    db.ref('posts/' + newPostKey).set(newPost)
-        .then(() => {
-            console.log('New post added successfully');
-            // Clear the form fields
-            document.getElementById('post-title').value = '';
-            document.getElementById('post-content').value = '';
-            // Refresh the page to display the new post
-            location.reload();
-        })
-        .catch((error) => {
-            console.error('Error adding new post:', error);
-            alert('Error adding new post. Please try again.');
+            // Save the new post in the database
+            db.ref('posts/' + newPostKey).set(newPost)
+                .then(() => {
+                    console.log('New post added successfully');
+                    // Hide the post creation form
+                    document.getElementById('post-form').style.display = 'none';
+                    // Clear the form fields
+                    document.getElementById('post-title').value = '';
+                    document.getElementById('post-content').value = '';
+                    // Refresh the page to display the new post
+                    location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error adding new post:', error);
+                    alert('Error adding new post. Please try again.');
+                });
         });
-});
-
-});
-        
-    
-    
     </script>
 </body>
 </html>
