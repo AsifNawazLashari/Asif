@@ -3,8 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Topic Details</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Reference to external CSS file -->
+    <title>Golden Age of Islamics</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        header {
+            background-color: #3b5998;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header a {
+            color: white;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .icon-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            font-size: 20px;
+            color: white;
+        }
+        .icon-button:hover {
+            color: #ccc;
+        }
+        .post {
+            background-color: white;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        .post-meta {
+            font-size: smaller;
+            color: #888;
+        }
+        .post-content {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .read-more {
+            color: blue;
+            cursor: pointer;
+        }
+        .hide {
+            display: none;
+        }
+        .profile-picture {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
     <!-- Header with icon buttons -->
@@ -23,9 +82,9 @@
         <input type="text" id="post-title" name="post-title" required><br><br>
         
         <label for="post-content">Content:</label><br>
-        <textarea id="post-content" name="post-content" rows="1" placeholder="What's on your mind?"></textarea><br><br>
+        <textarea id="post-content" name="post-content" rows="4" required></textarea><br><br>
         
-        <button type="submit">Post</button>
+        <button type="submit">Create Post</button>
     </form>
 
     <!-- Actual Topic Name -->
