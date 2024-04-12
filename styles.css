@@ -3,28 +3,57 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f2f2f2;
+    background-color: #FAE5D3; /* Light beige */
 }
 
 header {
-    background-image: url('bait_al_hikmah.jpg'); /* Background image for the header */
-    background-size: cover;
+    background-color: #B08D57; /* Brown */
     color: white;
-    padding: 20px;
-}
-
-.header-content {
+    padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-h1 {
-    margin: 0;
+.header-content {
+    display: flex;
+    align-items: center;
 }
 
-button {
-    background-color: #3b5998;
+.header-content h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+#post-area {
+    margin: 20px;
+}
+
+.post-input {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.post-input input[type="text"],
+.post-input textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.formatting-options {
+    /* Add formatting options such as text highlighter, font styles, colors, etc. */
+    margin-bottom: 10px;
+}
+
+.post-input button {
+    background-color: #B08D57; /* Brown */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -32,44 +61,21 @@ button {
     cursor: pointer;
 }
 
-button:hover {
-    background-color: #2d4373;
+.post-input button:hover {
+    background-color: #8A6343; /* Dark brown */
 }
 
-/* Posting area styles */
-#post-area {
-    padding: 20px;
-}
-
-.post-input {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-#post-content {
-    width: 100%;
-    height: 100px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-.formatting-options {
-    /* Add styling for formatting options */
-}
-
-/* Post layout styles */
+/* Post layout resembling Quora */
 .post {
     background-color: white;
     border: 1px solid #ccc;
-    border-radius: 10px;
+    border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
-    display: flex;
+}
+
+.post-details {
+    margin-left: 60px; /* Adjust margin to accommodate profile picture */
 }
 
 .profile-picture {
@@ -77,41 +83,37 @@ button:hover {
     height: 50px;
     border-radius: 50%;
     margin-right: 10px;
-    /* Add background image or placeholder styling */
-}
-
-.post-details {
-    flex-grow: 1;
+    background-color: #B08D57; /* Brown */
 }
 
 .user-designation {
+    margin: 0;
     font-weight: bold;
-    margin: 0 0 5px;
 }
 
 .post-time {
-    color: #888;
-    margin: 0;
+    color: #666;
+}
+
+.post-title {
+    margin: 5px 0;
+    color: #333;
 }
 
 .post-content {
     margin-bottom: 10px;
-    /* Add styles to show only first two lines */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Number of lines to show */
-    -webkit-box-orient: vertical;
 }
 
-.like-button, .comment-button {
+.like-button,
+.comment-button {
     background-color: transparent;
     border: none;
-    color: #3b5998;
+    color: #666;
     cursor: pointer;
     margin-right: 10px;
 }
 
-.like-button:hover, .comment-button:hover {
-    text-decoration: underline;
+.like-button:hover,
+.comment-button:hover {
+    color: #B08D57; /* Brown */
 }
