@@ -1,5 +1,4 @@
-
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -62,6 +61,12 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
+            margin-right: 10px;
+        }
+        .like-comment {
+            margin-top: 10px;
+        }
+        .like-comment button {
             margin-right: 10px;
         }
     </style>
@@ -141,10 +146,19 @@
                             <img src="sample_profile_picture.jpg" alt="Profile Picture" class="profile-picture">
                             <h2>${post.title}</h2>
                             <div class="post-meta">
-                                <span>${post.author}</span> | 
+                                <span>${post.authorId}</span> | 
                                 <span>${formatTime(post.createdAt)}</span>
                             </div>
-                            <p class="post-content">${post.content}</p>
+                            <p class="post-content">${getShortenedContent(post.content)}</p>
+                            <span class="read-more" data-post-id="${childSnapshot.key}">Read More...</span>
+                            <div class="full-post hide" id="post-${childSnapshot.key}">
+                                <!-- Full post content will be dynamically added here -->
+                                <p>${post.content}</p>
+                                <div class="like-comment">
+                                    <button onclick="likePost('${childSnapshot.key}')">Like</button>
+                                    <button onclick="commentPost('${childSnapshot.key}')">Comment</button>
+                                </div>
+                            </div>
                             <hr>
                         `;
                         document.getElementById('posts-list').appendChild(postElement);
@@ -164,51 +178,38 @@
             // Return formatted time string based on the timestamp
         }
 
-        // Event listener to show post creation form when "Create New Post" button is clicked
-        document.getElementById('create-post-button').addEventListener('click', function(event) {
-            document.getElementById('post-form').style.display = 'block';
+        // Function to get shortened content with "Read More..."
+        function getShortenedContent(content) {
+            // Get the first line of content
+            const firstLine = content.split('\n')[0];
+            if (firstLine.length > 50) {
+                // If the first line is too long, truncate it
+                return firstLine.substring(0, 50) + '...';
+            }
+            return firstLine;
+        }
+
+        // Event listener to expand post content when "Read More..." is clicked
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('read-more')) {
+                const postId = event.target.dataset.postId;
+                const fullPost = document.getElementById(`post-${postId}`);
+                fullPost.classList.toggle('hide');
+                event.target.textContent = fullPost.classList.contains('hide') ? 'Read More...' : 'Hide';
+            }
         });
 
-        // Event listener for submitting the post creation form
-        document.getElementById('post-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
+        // Function to handle liking a post
+        function likePost(postId) {
+            // You can implement the like functionality here
+            alert('Liked!');
+        }
 
-            // Get form values
-            const title = document.getElementById('post-title').value;
-            const content = document.getElementById('post-content').value;
-
-            // Get current timestamp
-            const timestamp = new Date().toISOString();
-
-            // Generate a unique ID for the new post
-            const newPostKey = db.ref().child('posts').push().key;
-
-            // Create the new post object
-            const newPost = {
-                title: title,
-                content: content,
-                author: "John Doe", // Replace with actual author name or user ID
-                createdAt: timestamp,
-                topicId: topicId
-            };
-
-            // Save the new post in the database
-            db.ref('posts/' + newPostKey).set(newPost)
-                .then(() => {
-                    console.log('New post added successfully');
-                    // Hide the post creation form
-                    document.getElementById('post-form').style.display = 'none';
-                    // Clear the form fields
-                    document.getElementById('post-title').value = '';
-                    document.getElementById('post-content').value = '';
-                    // Refresh the page to display the new post
-                    location.reload();
-                })
-                .catch((error) => {
-                    console.error('Error adding new post:', error);
-                    alert('Error adding new post. Please try again.');
-                });
-        });
+        // Function to handle commenting on a post
+        function commentPost(postId) {
+            // You can implement the comment functionality here
+            alert('Commented!');
+        }
     </script>
 </body>
 </html>
