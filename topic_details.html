@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,7 +14,7 @@
             background-color: #f2f2f2;
         }
         header {
-            background-color: #333;
+            background-color: #3b5998;
             color: white;
             padding: 10px;
             display: flex;
@@ -57,6 +58,12 @@
         .hide {
             display: none;
         }
+        .profile-picture {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -92,9 +99,6 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-storage.js"></script>
-
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -111,7 +115,6 @@
         firebase.initializeApp(firebaseConfig);
 
         const db = firebase.database();
-        const storage = firebase.storage(); // Reference to Firebase Storage
 
         // Function to extract topic ID from URL parameter
         function getTopicIdFromUrl() {
@@ -124,7 +127,7 @@
         if (topicId) {
             // Code to fetch and display topic details
             // For simplicity, let's assume the topic name is fetched from the database
-            const topicName = "<div id="topic-name"> // Replace with actual topic name
+            const topicName = "Sample Topic"; // Replace with actual topic name
             document.getElementById('topic-name').textContent = topicName;
 
             // Retrieve and display posts associated with the topic
@@ -132,26 +135,19 @@
                 .then((snapshot) => {
                     snapshot.forEach((childSnapshot) => {
                         const post = childSnapshot.val();
-                        const postId = childSnapshot.key;
                         const postElement = document.createElement('div');
                         postElement.classList.add('post');
                         postElement.innerHTML = `
+                            <img src="sample_profile_picture.jpg" alt="Profile Picture" class="profile-picture">
                             <h2>${post.title}</h2>
                             <div class="post-meta">
                                 <span>${post.author}</span> | 
                                 <span>${formatTime(post.createdAt)}</span>
                             </div>
-                            <p class="post-content">${getShortenedContent(post.content)}</p>
-                            <span class="read-more" data-post-id="${postId}">Read More...</span>
-                            <div class="full-post hide" id="post-${postId}">
-                                <!-- Full post content will be dynamically added here -->
-                            </div>
+                            <p class="post-content">${post.content}</p>
                             <hr>
                         `;
                         document.getElementById('posts-list').appendChild(postElement);
-
-                        // Fetch and display text content for each post
-                        fetchTextContent(postId);
                     });
                 })
                 .catch((error) => {
@@ -162,72 +158,10 @@
             alert('Topic ID not found in URL parameter.');
         }
 
-        // Function to fetch text content from Firebase Storage
-        function fetchTextContent(postId) {
-            // Reference to the text file in Firebase Storage
-            const textRef = storage.ref().child(`text-files/${postId}.txt`);
-
-            // Get the download URL for the text file
-            textRef.getDownloadURL()
-                .then((url) => {
-                    // Fetch the text content using the download URL
-                    fetch(url)
-                        .then(response => response.text())
-                        .then(data => {
-                            // Display the text content in the post element
-                            const fullPostElement = document.getElementById(`post-${postId}`);
-                            fullPostElement.innerHTML = `<p>${data}</p>`;
-                        })
-                        .catch(error => {
-                            console.error('Error fetching text content:', error);
-                        });
-                })
-                .catch(error => {
-                    console.error('Error getting download URL:', error);
-                });
-        }
-
         // Function to format time (e.g., Today, Yesterday, Just Now, 1 year ago, etc.)
         function formatTime(timestamp) {
             // To be implemented
             // Return formatted time string based on the timestamp
-        }
-
-        // Function to get shortened content with "Read More..."
-        function getShortenedContent(content) {
-            // To be implemented
-            // Return the first line of content with "Read More..." appended
-        }
-
-        // Event listener to expand post content when "Read More..." is clicked
-        document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('read-more')) {
-                const postId = event.target.dataset.postId;
-                const fullPost = document.getElementById(`post-${postId}`);
-                if (fullPost.innerHTML === '') {
-                    // Fetch the full post content via AJAX
-                    fetchPostContent(postId, fullPost);
-                } else {
-                    fullPost.classList.toggle('hide');
-                }
-            }
-        });
-
-        // Function to fetch full post content via AJAX
-        function fetchPostContent(postId, container) {
-            // Make AJAX request to fetch full post content from the server
-            // For demonstration purposes, let's assume the content is fetched from a server-side endpoint
-            fetch(`/api/posts/${postId}`)
-                .then(response => response.text())
-                .then(data => {
-                    // Populate the container with the fetched content
-                    container.innerHTML = `<p>${data}</p>`;
-                    // Show the container
-                    container.classList.remove('hide');
-                })
-                .catch(error => {
-                    console.error('Error fetching post content:', error);
-                });
         }
 
         // Event listener to show post creation form when "Create New Post" button is clicked
@@ -243,38 +177,38 @@
             const title = document.getElementById('post-title').value;
             const content = document.getElementById('post-content').value;
 
-            // Upload the text to Firebase Storage
-            uploadTextToStorage(title, content);
+            // Get current timestamp
+            const timestamp = new Date().toISOString();
+
+            // Generate a unique ID for the new post
+            const newPostKey = db.ref().child('posts').push().key;
+
+            // Create the new post object
+            const newPost = {
+                title: title,
+                content: content,
+                author: "John Doe", // Replace with actual author name or user ID
+                createdAt: timestamp,
+                topicId: topicId
+            };
+
+            // Save the new post in the database
+            db.ref('posts/' + newPostKey).set(newPost)
+                .then(() => {
+                    console.log('New post added successfully');
+                    // Hide the post creation form
+                    document.getElementById('post-form').style.display = 'none';
+                    // Clear the form fields
+                    document.getElementById('post-title').value = '';
+                    document.getElementById('post-content').value = '';
+                    // Refresh the page to display the new post
+                    location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error adding new post:', error);
+                    alert('Error adding new post. Please try again.');
+                });
         });
-
-        // Function to upload text to Firebase Storage
-        function uploadTextToStorage(title, content) {
-            const text = `${title}\n${content}`;
-
-            if (text.length <= 5000) {
-                // Text is within the allowed limit
-                // Specify the path where the text will be stored in Firebase Storage
-                const storageRef = firebase.storage().ref().child(`text-files/${Date.now()}.txt`);
-
-                // Upload the text to Firebase Storage
-                storageRef.putString(text)
-                    .then(snapshot => {
-                        console.log('Text uploaded successfully');
-                        // Show success message
-                        alert('Text uploaded successfully!');
-                    })
-                    .catch(error => {
-                        console.error('Error uploading text:', error);
-                        // Show error message
-                        alert('Error uploading text. Please try again.');
-                    });
-            } else {
-                // Text exceeds the allowed limit
-                console.error('Text exceeds the maximum allowed limit of 5000 characters');
-                // Show error message
-                alert('Text exceeds the maximum allowed limit of 5000 characters');
-            }
-        }
     </script>
 </body>
 </html>
