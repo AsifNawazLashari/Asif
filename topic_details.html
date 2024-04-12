@@ -89,9 +89,6 @@
         <!-- Posts associated with the topic will be dynamically added here -->
     </div>
 
-    <!-- Text content -->
-    <div id="text-content"></div>
-
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
@@ -102,13 +99,12 @@
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
-  authDomain: "alif-ac574.firebaseapp.com",
-  databaseURL: "https://alif-ac574-default-rtdb.firebaseio.com",
-  projectId: "alif-ac574",
-  storageBucket: "alif-ac574.appspot.com",
-  messagingSenderId: "261987716644",
-  appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
-  measurementId: "G-YGQ1V6489M"
+            authDomain: "alif-ac574.firebaseapp.com",
+            projectId: "alif-ac574",
+            storageBucket: "alif-ac574.appspot.com",
+            messagingSenderId: "261987716644",
+            appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
+            measurementId: "G-YGQ1V6489M"
         };
 
         // Initialize Firebase
@@ -128,7 +124,7 @@
         if (topicId) {
             // Code to fetch and display topic details
             // For simplicity, let's assume the topic name is fetched from the database
-            const topicName = "Sample Topic"; // Replace with actual topic name
+            const topicName = "<div id="topic-name"> // Replace with actual topic name
             document.getElementById('topic-name').textContent = topicName;
 
             // Retrieve and display posts associated with the topic
@@ -217,6 +213,23 @@
             }
         });
 
+        // Function to fetch full post content via AJAX
+        function fetchPostContent(postId, container) {
+            // Make AJAX request to fetch full post content from the server
+            // For demonstration purposes, let's assume the content is fetched from a server-side endpoint
+            fetch(`/api/posts/${postId}`)
+                .then(response => response.text())
+                .then(data => {
+                    // Populate the container with the fetched content
+                    container.innerHTML = `<p>${data}</p>`;
+                    // Show the container
+                    container.classList.remove('hide');
+                })
+                .catch(error => {
+                    console.error('Error fetching post content:', error);
+                });
+        }
+
         // Event listener to show post creation form when "Create New Post" button is clicked
         document.getElementById('create-post-button').addEventListener('click', function(event) {
             document.getElementById('post-form').style.display = 'block';
@@ -238,24 +251,17 @@
         function uploadTextToStorage(title, content) {
             const text = `${title}\n${content}`;
 
-            // Generate a unique filename using timestamp and a unique identifier
-            const timestamp = new Date().getTime();
-            const uniqueId = Math.random().toString(36).substring(7);
-            const filename = `${timestamp}_${uniqueId}.txt`;
-
-            // Specify the path where the text will be stored in Firebase Storage
-            const storageRef = firebase.storage().ref().child(`text-files/${filename}`);
-
             if (text.length <= 5000) {
                 // Text is within the allowed limit
+                // Specify the path where the text will be stored in Firebase Storage
+                const storageRef = firebase.storage().ref().child(`text-files/${Date.now()}.txt`);
+
                 // Upload the text to Firebase Storage
                 storageRef.putString(text)
                     .then(snapshot => {
                         console.log('Text uploaded successfully');
                         // Show success message
                         alert('Text uploaded successfully!');
-                        // Fetch and display the latest text content
-                        fetchTextContent(filename);
                     })
                     .catch(error => {
                         console.error('Error uploading text:', error);
@@ -272,5 +278,3 @@
     </script>
 </body>
 </html>
-
-
