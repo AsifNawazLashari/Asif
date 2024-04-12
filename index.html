@@ -118,7 +118,7 @@ document.getElementById('create-post-button').addEventListener('click', function
 });
 
 // Event listener for submitting the post creation form
-document.getElementById('post-form').addEventListener('submit', function(event) {
+document.getElementById('post-button').addEventListener('click', function(event) {
     event.preventDefault(); // Prevent form submission
 
     // Get form values
@@ -144,8 +144,6 @@ document.getElementById('post-form').addEventListener('submit', function(event) 
     db.ref('posts/' + newPostKey).set(newPost)
         .then(() => {
             console.log('New post added successfully');
-            // Hide the post creation form
-            document.getElementById('post-form').style.display = 'none';
             // Clear the form fields
             document.getElementById('post-title').value = '';
             document.getElementById('post-content').value = '';
@@ -156,6 +154,8 @@ document.getElementById('post-form').addEventListener('submit', function(event) 
             console.error('Error adding new post:', error);
             alert('Error adding new post. Please try again.');
         });
+});
+
 });
         
     
