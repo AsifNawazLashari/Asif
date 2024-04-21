@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Signup</title>
+  <title>Registration</title>
   <!-- Bootstrap CSS -->
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css'>
   <!-- Google Fonts -->
@@ -22,7 +22,7 @@
     .signin-text{
         font-style: normal;
         font-weight: 600 !important;
-        position: relative;
+        text-align: center;
     }
     .curved-line {
         position: absolute;
@@ -129,7 +129,7 @@ const firebaseConfig = {
         <img src="header.jpg" alt="Header Image" class="img-fluid">
       </div>
       <div class="col-md-6">
-        <h3 class="signin-text mb-3">Signup</h3>
+        <h3 class="signin-text mb-3">Registration</h3>
         <form>
           <div class="form-group">
             <label for="email">Email</label>
@@ -157,12 +157,11 @@ const firebaseConfig = {
             <label class="form-check-label" for="checkbox">I agree to the terms and conditions</label>
           </div>
           <button type="button" class="btn btn-class" onclick="signup()">Signup</button>
+          <a href="signin.html" class="btn btn-primary">Login</a>
         </form>
-        <!-- Curved line -->
-        <div class="curved-line bg-secondary"></div>
-        <p class="text-center mt-3 text-secondary">Largest Science Community In Pakistan</p>
       </div>
     </div>
   </div>
 </body>
 </html>
+
