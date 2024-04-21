@@ -13,10 +13,11 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <!-- SweetAlert for better alerts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <!-- Your custom CSS -->
   <style> 
   body {
   font-family: Arial, sans-serif;
-  background-color: #f8f8f8;
+  background-color: #e8d49f; /* Golden color */
   margin: 0;
   padding: 0;
 }
@@ -29,7 +30,7 @@
 }
 
 .signup-container {
-  background-color: #fff;
+  background-color: #f0e9d9; /* Light golden color */
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -47,6 +48,7 @@ form {
   flex-direction: column;
 }
 
+input[type="text"],
 input[type="email"],
 input[type="password"],
 button[type="submit"] {
@@ -57,14 +59,14 @@ button[type="submit"] {
 }
 
 button[type="submit"] {
-  background-color: #007bff;
+  background-color: #d4af37; /* Gold color */
   color: #fff;
   border: none;
   cursor: pointer;
 }
 
 button[type="submit"]:hover {
-  background-color: #0056b3;
+  background-color: #b8860b; /* Dark golden color */
 }
     
   
@@ -75,8 +77,16 @@ button[type="submit"]:hover {
     <div class="signup-container">
       <h2>Signup</h2>
       <form @submit.prevent="signup">
+        <input type="text" v-model="fullName" placeholder="Full Name" required>
         <input type="email" v-model="email" placeholder="Email" required>
         <input type="password" v-model="password" placeholder="Password" required>
+        <input type="password" v-model="rePassword" placeholder="Re-enter Password" required>
+        <label>
+          <input type="radio" v-model="gender" value="male"> Male
+        </label>
+        <label>
+          <input type="radio" v-model="gender" value="female"> Female
+        </label>
         <button type="submit">Signup</button>
       </form>
     </div>
@@ -84,7 +94,7 @@ button[type="submit"]:hover {
 
   <script>
     // Firebase configuration
-   
+    
 const firebaseConfig = {
   apiKey: "AIzaSyAqbaHNHq-z5hmhIW4Tnzl0--Wm5Aj49gE",
   authDomain: "alif-495ff.firebaseapp.com",
@@ -102,12 +112,24 @@ const firebaseConfig = {
       el: '#app',
       data() {
         return {
+          fullName: '',
           email: '',
-          password: ''
+          password: '',
+          rePassword: '',
+          gender: ''
         };
       },
       methods: {
         signup() {
+          if (this.password !== this.rePassword) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Password Mismatch',
+              text: 'Please make sure the passwords match.',
+            });
+            return;
+          }
+
           firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
             .then((userCredential) => {
               // Signed up successfully
