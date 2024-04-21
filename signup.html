@@ -44,7 +44,10 @@
               <span v-if="isLogin">Login</span>
               <span v-else>Signup</span>
             </v-btn>
-            <v-btn text @click="toggleForm">{{ isLogin ? 'Switch to Signup' : 'Switch to Login' }}</v-btn>
+            <v-btn text @click="toggleForm">
+              <span v-if="isLogin">Switch to Signup</span>
+              <span v-else>Switch to Login</span>
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-container>
@@ -62,10 +65,6 @@ const firebaseConfig = {
   appId: "1:636697141623:web:f6bbef53e973cf24df4172",
   measurementId: "G-GWD6ZQJS0L"
 };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-
     new Vue({
       el: '#app',
       vuetify: new Vuetify(),
