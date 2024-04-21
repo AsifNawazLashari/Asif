@@ -3,59 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Signup Page</title>
+  <title>Login / Signup</title>
   <!-- Link to Vue.js via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
   <!-- SweetAlert for better alerts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <!-- Your custom CSS -->
   <style> 
-  
-  /* Reset default styles */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
+  body {
   font-family: Arial, sans-serif;
-  background-color: #ffffff; /* White */
-}
-
-#app {
+  background-color: #f2f2f2; /* Light gray */
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  height: 100vh;
+  margin: 0;
 }
 
-.header {
-  width: 100%;
-  height: 200px; /* Adjust height as needed */
-  overflow: hidden;
-}
-
-.header img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.signup-container {
+.card {
   background-color: #ffffff; /* White */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 400px;
+}
+
+.toggle {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eeeeee; /* Light gray */
+}
+
+.toggle span {
+  padding: 15px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #888888; /* Gray */
+  transition: all 0.3s;
+}
+
+.toggle span.active {
+  color: #000000; /* Black */
+  font-weight: bold;
+}
+
+.content {
   padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  width: 90%;
-  margin-top: 20px;
 }
 
 h2 {
-  text-align: center;
   margin-bottom: 20px;
+  text-align: center;
 }
 
 form {
@@ -69,12 +69,8 @@ input[type="password"],
 button[type="submit"] {
   padding: 10px;
   margin-bottom: 10px;
-  border: 1px solid #007bff; /* Blue */
+  border: 1px solid #cccccc; /* Light gray */
   border-radius: 5px;
-}
-
-input[type="radio"] {
-  margin-right: 5px;
 }
 
 .gender-container {
@@ -82,14 +78,8 @@ input[type="radio"] {
   margin-bottom: 10px;
 }
 
-.terms-condition {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.terms-condition input[type="checkbox"] {
-  margin-right: 5px;
+.gender-container label {
+  margin-right: 10px;
 }
 
 button[type="submit"] {
@@ -97,6 +87,7 @@ button[type="submit"] {
   color: #ffffff; /* White */
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 button[type="submit"]:hover {
@@ -108,32 +99,32 @@ button[type="submit"]:hover {
 </head>
 <body>
   <div id="app">
-    <!-- Header with Golden Age of Islam image -->
-    <header class="header">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Medieval_Islamic_Golden_Age.jpg" alt="Golden Age of Islam">
-    </header>
-
-    <div class="signup-container">
-      <h2>Signup</h2>
-      <form @submit.prevent="signup">
-        <input type="text" v-model="fullName" placeholder="Full Name" required>
-        <input type="email" v-model="email" placeholder="Email" required>
-        <input type="password" v-model="password" placeholder="Password" required>
-        <input type="password" v-model="rePassword" placeholder="Re-enter Password" required>
-        <div class="gender-container">
-          <label>
-            <input type="radio" v-model="gender" value="male" required> Male
-          </label>
-          <label>
-            <input type="radio" v-model="gender" value="female" required> Female
-          </label>
-        </div>
-        <div class="terms-condition">
-          <input type="checkbox" v-model="agreeTerms" required>
-          <label>I agree to the Terms and Conditions</label>
-        </div>
-        <button type="submit">Signup</button>
-      </form>
+    <div class="card">
+      <div class="toggle">
+        <span :class="{ active: isLogin }" @click="isLogin = true">Login</span>
+        <span :class="{ active: !isLogin }" @click="isLogin = false">Signup</span>
+      </div>
+      <div class="content">
+        <h2 v-if="isLogin">Login</h2>
+        <h2 v-else>Signup</h2>
+        <form @submit.prevent="isLogin ? login() : signup()">
+          <input v-if="isLogin" type="email" v-model="email" placeholder="Email" required>
+          <input v-if="!isLogin" type="text" v-model="fullName" placeholder="Full Name" required>
+          <input type="email" v-model="email" placeholder="Email" required>
+          <input type="password" v-model="password" placeholder="Password" required>
+          <input type="password" v-model="rePassword" v-if="!isLogin" placeholder="Re-enter Password" required>
+          <div class="gender-container" v-if="!isLogin">
+            <label>
+              <input type="radio" v-model="gender" value="male"> Male
+            </label>
+            <label>
+              <input type="radio" v-model="gender" value="female"> Female
+            </label>
+          </div>
+          <button type="submit" v-if="isLogin">Login</button>
+          <button type="submit" v-else>Signup</button>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -156,30 +147,41 @@ const firebaseConfig = {
       el: '#app',
       data() {
         return {
+          isLogin: true,
           fullName: '',
           email: '',
           password: '',
           rePassword: '',
-          gender: '',
-          agreeTerms: false
+          gender: ''
         };
       },
       methods: {
+        login() {
+          firebase.auth().signInWithEmailAndPassword(this.email, this.password)
+            .then((userCredential) => {
+              // Logged in successfully
+              console.log('User logged in:', userCredential.user);
+              Swal.fire({
+                icon: 'success',
+                title: 'Login Successful',
+                text: 'You are now logged in.',
+              });
+            })
+            .catch((error) => {
+              console.error('Login error:', error.message);
+              Swal.fire({
+                icon: 'error',
+                title: 'Login Failed',
+                text: error.message,
+              });
+            });
+        },
         signup() {
           if (this.password !== this.rePassword) {
             Swal.fire({
               icon: 'error',
               title: 'Password Mismatch',
               text: 'Please make sure the passwords match.',
-            });
-            return;
-          }
-
-          if (!this.agreeTerms) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Terms Agreement Required',
-              text: 'Please agree to the Terms and Conditions.',
             });
             return;
           }
