@@ -8,41 +8,9 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <!-- Link to Vuetify via CDN -->
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.5.10/dist/vuetify.min.css" rel="stylesheet">
-  <!-- Custom CSS -->
-  <style>
-    body {
-      background-color: #87CEEB; /* Light blue sky background */
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    #app {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .card {
-      width: 100%;
-      max-width: 400px;
-      padding: 24px;
-      background-color: #fff; /* White card */
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .card__title {
-      color: #2196F3; /* Blue color for the title */
-      font-size: 24px;
-      margin-bottom: 24px;
-    }
-    .form__input {
-      width: 100%;
-      margin-bottom: 16px;
-    }
-    .btn {
-      width: 100%;
-    }
-  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-auth.js"></script>
 </head>
 <body>
   <div id="app">
@@ -73,6 +41,20 @@
   </div>
 
   <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAqbaHNHq-z5hmhIW4Tnzl0--Wm5Aj49gE",
+      authDomain: "alif-495ff.firebaseapp.com",
+      projectId: "alif-495ff",
+      storageBucket: "alif-495ff.appspot.com",
+      messagingSenderId: "636697141623",
+      appId: "1:636697141623:web:f6bbef53e973cf24df4172",
+      measurementId: "G-GWD6ZQJS0L"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
     new Vue({
       el: '#app',
       vuetify: new Vuetify(),
@@ -88,12 +70,33 @@
       },
       methods: {
         login() {
-          // Perform login logic
-          console.log('Login clicked');
+          firebase.auth().signInWithEmailAndPassword(this.email, this.password)
+            .then((userCredential) => {
+              // Logged in successfully
+              console.log('User logged in:', userCredential.user);
+              // Redirect or perform other actions after successful login
+            })
+            .catch((error) => {
+              console.error('Login error:', error.message);
+              // Display error message to the user
+            });
         },
         signup() {
-          // Perform signup logic
-          console.log('Signup clicked');
+          if (this.password !== this.rePassword) {
+            // Display error message for password mismatch
+            return;
+          }
+
+          firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
+            .then((userCredential) => {
+              // Signed up successfully
+              console.log('User signed up:', userCredential.user);
+              // Redirect or perform other actions after successful signup
+            })
+            .catch((error) => {
+              console.error('Signup error:', error.message);
+              // Display error message to the user
+            });
         }
       }
     });
