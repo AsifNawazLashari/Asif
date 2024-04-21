@@ -44,7 +44,10 @@
               <span v-if="isLogin">Login</span>
               <span v-else>Signup</span>
             </v-btn>
-            <v-btn text @click="toggleForm">{{ isLogin ? 'Switch to Signup' : 'Switch to Login' }}</v-btn>
+            <v-btn text @click="toggleForm">
+              <span v-if="isLogin">Switch to Signup</span>
+              <span v-else>Switch to Login</span>
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-container>
@@ -157,4 +160,5 @@ const firebaseConfig = {
     });
   </script>
 </body>
-</html>
+  </html>
+  
