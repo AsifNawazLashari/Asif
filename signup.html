@@ -6,51 +6,53 @@
   <title>Login / Signup</title>
   <!-- Link to Vue.js via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  <!-- Link to Vuetify via CDN -->
+  <!-- Vuetify CSS -->
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.5.10/dist/vuetify.min.css" rel="stylesheet">
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-auth.js"></script>
+  <!-- SweetAlert for better alerts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <!-- Vuetify JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.5.10/dist/vuetify.js"></script>
 </head>
 <body>
   <div id="app">
     <v-app>
-      <v-main>
-        <v-container>
-          <v-row justify="center">
-            <v-col cols="12" sm="8" md="6">
-              <v-card elevation="2">
-                <v-toolbar color="primary" dark flat>
-                  <v-toolbar-title>{{ isLogin ? 'Login' : 'Signup' }}</v-toolbar-title>
-                  <v-spacer></v-spacer>
-                  <v-btn icon @click="toggleForm">
-                    <v-icon>{{ isLogin ? 'mdi-account-plus' : 'mdi-account-arrow-right' }}</v-icon>
-                  </v-btn>
-                </v-toolbar>
-                <v-card-text>
-                  <v-form v-model="valid" ref="form">
-                    <v-text-field v-model="email" label="Email" type="email" outlined required></v-text-field>
-                    <v-text-field v-if="!isLogin" v-model="fullName" label="Full Name" outlined required></v-text-field>
-                    <v-text-field v-model="password" label="Password" type="password" outlined required></v-text-field>
-                    <v-text-field v-if="!isLogin" v-model="rePassword" label="Re-enter Password" type="password" outlined required></v-text-field>
-                    <v-checkbox v-if="!isLogin" v-model="agreeTerms" label="I agree to the Terms and Conditions" required></v-checkbox>
-                  </v-form>
-                </v-card-text>
-                <v-card-actions>
-                  <v-btn color="primary" dark @click="isLogin ? login() : signup()" :disabled="!valid">
-                    {{ isLogin ? 'Login' : 'Signup' }}
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-main>
+      <v-container>
+        <v-card>
+          <v-card-title>
+            <h2 v-if="isLogin">Login</h2>
+            <h2 v-else>Signup</h2>
+          </v-card-title>
+          <v-card-text>
+            <v-form v-model="valid" ref="form">
+              <v-text-field v-if="isLogin" v-model="loginEmail" label="Email" type="email" required></v-text-field>
+              <v-text-field v-else v-model="signupEmail" label="Email" type="email" required></v-text-field>
+              <v-text-field v-if="!isLogin" v-model="fullName" label="Full Name" required></v-text-field>
+              <v-text-field v-model="password" label="Password" type="password" required></v-text-field>
+              <v-text-field v-if="!isLogin" v-model="rePassword" label="Re-enter Password" type="password" required></v-text-field>
+              <v-radio-group v-if="!isLogin" v-model="gender" row>
+                <v-radio label="Male" value="male"></v-radio>
+                <v-radio label="Female" value="female"></v-radio>
+              </v-radio-group>
+              <v-checkbox v-model="agreeTerms" label="I agree to the Terms and Conditions" required></v-checkbox>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn :color="isLogin ? 'primary' : 'success'" @click="isLogin ? login() : signup()" :disabled="!valid">
+              <span v-if="isLogin">Login</span>
+              <span v-else>Signup</span>
+            </v-btn>
+            <v-btn text @click="toggleForm">{{ isLogin ? 'Switch to Signup' : 'Switch to Login' }}</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-container>
     </v-app>
   </div>
 
   <script>
-    // Initialize Firebase with your project's configuration
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_AUTH_DOMAIN",
@@ -59,6 +61,8 @@
       messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
       appId: "YOUR_APP_ID"
     };
+
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
     new Vue({
@@ -68,57 +72,83 @@
         return {
           isLogin: true,
           fullName: '',
-          email: '',
+          loginEmail: '',
+          signupEmail: '',
           password: '',
           rePassword: '',
+          gender: '',
           agreeTerms: false,
           valid: true
         };
       },
       methods: {
         login() {
-          firebase.auth().signInWithEmailAndPassword(this.email, this.password)
+          firebase.auth().signInWithEmailAndPassword(this.loginEmail, this.password)
             .then((userCredential) => {
               // Logged in successfully
               console.log('User logged in:', userCredential.user);
-              // Redirect or perform other actions after successful login
+              Swal.fire({
+                icon: 'success',
+                title: 'Login Successful',
+                text: 'You are now logged in.',
+              });
             })
             .catch((error) => {
               console.error('Login error:', error.message);
-              // Display error message to the user
+              Swal.fire({
+                icon: 'error',
+                title: 'Login Failed',
+                text: error.message,
+              });
             });
         },
         signup() {
           if (this.password !== this.rePassword) {
-            // Display error message for password mismatch
+            Swal.fire({
+              icon: 'error',
+              title: 'Password Mismatch',
+              text: 'Please make sure the passwords match.',
+            });
             return;
           }
 
           if (!this.agreeTerms) {
-            // Display error message for missing terms agreement
+            Swal.fire({
+              icon: 'error',
+              title: 'Terms Agreement Required',
+              text: 'Please agree to the Terms and Conditions.',
+            });
             return;
           }
 
-          firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
+          firebase.auth().createUserWithEmailAndPassword(this.signupEmail, this.password)
             .then((userCredential) => {
               // Signed up successfully
               console.log('User signed up:', userCredential.user);
-              // Redirect or perform other actions after successful signup
+              Swal.fire({
+                icon: 'success',
+                title: 'Signup Successful',
+                text: 'You can now login with your credentials.',
+              });
             })
             .catch((error) => {
               console.error('Signup error:', error.message);
-              // Display error message to the user
+              Swal.fire({
+                icon: 'error',
+                title: 'Signup Failed',
+                text: error.message,
+              });
             });
         },
         toggleForm() {
           this.isLogin = !this.isLogin;
-          this.clearForm();
-        },
-        clearForm() {
+          // Clear form data when switching between login and signup
           this.fullName = '';
-          this.email = '';
+          this.loginEmail = '';
+          this.signupEmail = '';
           this.password = '';
           this.rePassword = '';
+          this.gender = '';
           this.agreeTerms = false;
           this.valid = true;
         }
