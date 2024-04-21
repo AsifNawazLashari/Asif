@@ -9,8 +9,8 @@
   <!-- Link to Vuetify via CDN -->
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.5.10/dist/vuetify.min.css" rel="stylesheet">
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-auth.js"></script>
 </head>
 <body>
   <div id="app">
@@ -50,16 +50,15 @@
   </div>
 
   <script>
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAqbaHNHq-z5hmhIW4Tnzl0--Wm5Aj49gE",
-  authDomain: "alif-495ff.firebaseapp.com",
-  projectId: "alif-495ff",
-  storageBucket: "alif-495ff.appspot.com",
-  messagingSenderId: "636697141623",
-  appId: "1:636697141623:web:f6bbef53e973cf24df4172",
-  measurementId: "G-GWD6ZQJS0L"
-};
+    // Initialize Firebase with your project's configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
     firebase.initializeApp(firebaseConfig);
 
     new Vue({
