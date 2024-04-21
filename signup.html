@@ -12,85 +12,15 @@
   <!-- SweetAlert for better alerts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <!-- Your custom CSS -->
-  <style> 
-  body {
-  font-family: Arial, sans-serif;
-  background-color: #ffffff; /* White */
-  margin: 0;
-  padding: 0;
-}
-
-#app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.signup-container {
-  background-color: #ffffff; /* White */
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  width: 90%;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-button[type="submit"] {
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #007bff; /* Blue */
-  border-radius: 5px;
-}
-
-input[type="radio"] {
-  margin-right: 5px;
-}
-
-.gender-container {
-  margin-bottom: 10px;
-}
-
-.terms-condition {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.terms-condition input[type="checkbox"] {
-  margin-right: 5px;
-}
-
-button[type="submit"] {
-  background-color: #007bff; /* Blue */
-  color: #ffffff; /* White */
-  border: none;
-  cursor: pointer;
-}
-
-button[type="submit"]:hover {
-  background-color: #0056b3; /* Dark blue */
-}
-
-    
-  
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div id="app">
+    <!-- Header with Golden Age of Islam image -->
+    <header class="header">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Medieval_Islamic_Golden_Age.jpg" alt="Golden Age of Islam">
+    </header>
+
     <div class="signup-container">
       <h2>Signup</h2>
       <form @submit.prevent="signup">
@@ -100,10 +30,10 @@ button[type="submit"]:hover {
         <input type="password" v-model="rePassword" placeholder="Re-enter Password" required>
         <div class="gender-container">
           <label>
-            <input type="radio" v-model="gender" value="male"> Male
+            <input type="radio" v-model="gender" value="male" required> Male
           </label>
           <label>
-            <input type="radio" v-model="gender" value="female"> Female
+            <input type="radio" v-model="gender" value="female" required> Female
           </label>
         </div>
         <div class="terms-condition">
