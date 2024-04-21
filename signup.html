@@ -6,177 +6,51 @@
   <title>Login / Signup</title>
   <!-- Link to Vue.js via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <!-- Vuetify CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.5.10/dist/vuetify.min.css" rel="stylesheet">
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-auth.js"></script>
   <!-- SweetAlert for better alerts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-  <style> 
-
-    body {
-  font-family: Arial, sans-serif;
-  background-color: #f2f2f2; /* Light gray */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
-
-.card {
-  background-color: #ffffff; /* White */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 400px;
-  overflow: hidden; /* Ensure rounded corners are visible */
-}
-
-.header img {
-  width: 100%;
-  object-fit: cover;
-}
-
-.toggle-container {
-  display: flex;
-}
-
-.toggle {
-  flex-grow: 1;
-  padding: 15px;
-  font-size: 16px;
-  cursor: pointer;
-  color: #888888; /* Gray */
-  border: none;
-  background-color: transparent;
-  transition: all 0.3s;
-}
-
-.toggle.active {
-  color: #000000; /* Black */
-  font-weight: bold;
-}
-
-.content {
-  padding: 20px;
-}
-
-h2 {
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-button[type="submit"] {
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #cccccc; /* Light gray */
-  border-radius: 5px;
-}
-
-.gender-container {
-  display: flex;
-  margin-bottom: 10px;
-}
-
-.gender-container label {
-  margin-right: 10px;
-}
-
-.terms-condition {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.terms-condition input[type="checkbox"] {
-  margin-right: 5px;
-}
-
-button[type="submit"] {
-  background-color: #4CAF50; /* Green */
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button[type="submit"]:hover {
-  background-color: #45a049;
-}
-
-.swal2-popup {
-  font-family: Arial, sans-serif;
-}
-
-.swal2-title {
-  color: #4CAF50; /* Green */
-}
-
-.swal2-content {
-  color: #333;
-}
-
-.swal2-icon {
-  color: #4CAF50; /* Green */
-}
-
-.swal2-confirm {
-  background-color: #4CAF50; /* Green */
-  border-color: #4CAF50; /* Green */
-}
-
-.swal2-cancel {
-  background-color: #ccc; /* Light gray */
-  border-color: #ccc; /* Light gray */
-}
-    </style>
+  <!-- Your custom CSS -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div id="app">
-    <div class="card">
-      <div class="header">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Medieval_Islamic_Golden_Age.jpg" alt="Golden Age of Islam">
-      </div>
-      <div class="toggle-container">
-        <button class="toggle" :class="{ active: isLogin }" @click="isLogin = true">Login</button>
-        <button class="toggle" :class="{ active: !isLogin }" @click="isLogin = false">Signup</button>
-      </div>
-      <div class="content">
-        <h2 v-if="isLogin">Login</h2>
-        <h2 v-else>Signup</h2>
-        <form @submit.prevent="isLogin ? login() : signup()">
-          <input type="email" v-model="email" placeholder="Email" required>
-          <input v-if="!isLogin" type="text" v-model="fullName" placeholder="Full Name" required>
-          <input type="password" v-model="password" placeholder="Password" required>
-          <input v-if="!isLogin" type="password" v-model="rePassword" placeholder="Re-enter Password" required>
-          <div class="gender-container" v-if="!isLogin">
-            <label>
-              <input type="radio" v-model="gender" value="male"> Male
-            </label>
-            <label>
-              <input type="radio" v-model="gender" value="female"> Female
-            </label>
-          </div>
-          <div class="terms-condition">
-            <input type="checkbox" v-model="agreeTerms" required>
-            <label>I agree to the Terms and Conditions</label>
-          </div>
-          <button type="submit" v-if="isLogin">Login</button>
-          <button type="submit" v-else>Signup</button>
-        </form>
-      </div>
-    </div>
+    <v-app>
+      <v-container>
+        <v-card>
+          <v-card-title>
+            <h2 v-if="isLogin">Login</h2>
+            <h2 v-else>Signup</h2>
+          </v-card-title>
+          <v-card-text>
+            <v-form v-model="valid" ref="form">
+              <v-text-field v-model="email" :label="isLogin ? 'Email' : 'Full Name'" type="email" required></v-text-field>
+              <v-text-field v-if="!isLogin" v-model="fullName" label="Full Name" required></v-text-field>
+              <v-text-field v-model="password" label="Password" type="password" required></v-text-field>
+              <v-text-field v-if="!isLogin" v-model="rePassword" label="Re-enter Password" type="password" required></v-text-field>
+              <v-radio-group v-if="!isLogin" v-model="gender" row>
+                <v-radio label="Male" value="male"></v-radio>
+                <v-radio label="Female" value="female"></v-radio>
+              </v-radio-group>
+              <v-checkbox v-model="agreeTerms" label="I agree to the Terms and Conditions" required></v-checkbox>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn :color="isLogin ? 'primary' : 'success'" @click="isLogin ? login() : signup()" :disabled="!valid">
+              {{ isLogin ? 'Login' : 'Signup' }}
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-container>
+    </v-app>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.5.10/dist/vuetify.js"></script>
   <script>
-    // Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAqbaHNHq-z5hmhIW4Tnzl0--Wm5Aj49gE",
   authDomain: "alif-495ff.firebaseapp.com",
@@ -192,6 +66,7 @@ const firebaseConfig = {
 
     new Vue({
       el: '#app',
+      vuetify: new Vuetify(),
       data() {
         return {
           isLogin: true,
@@ -200,7 +75,8 @@ const firebaseConfig = {
           password: '',
           rePassword: '',
           gender: '',
-          agreeTerms: false
+          agreeTerms: false,
+          valid: true
         };
       },
       methods: {
