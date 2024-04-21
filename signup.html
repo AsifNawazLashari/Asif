@@ -5,60 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login / Signup</title>
   <!-- Bootstrap CSS -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Google Sign-in button CSS -->
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css'>
+  <!-- Google Fonts -->
+  <link href='https://fonts.googleapis.com/css2?family=Poppins&display=swap' rel='stylesheet'>
   <style>
-    #googleSignIn button {
-      background-color: #fff;
-      color: #333;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    body{
+        font-family: 'Poppins', sans-serif;
+        background-color: #00ac96;
     }
-    #googleSignIn button:hover {
-      background-color: #f1f1f1;
+    .content{
+        margin: 8%;
+        background-color: #fff;
+        padding: 4rem 1rem 4rem 1rem;
+        box-shadow: 0 0 5px 5px rgba(0,0,0, .05);
+    }
+    .signin-text{
+        font-style: normal;
+        font-weight: 600 !important;
+    }
+    .form-control{
+        display: block;
+        width:100%;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height:1.5;
+        border-color: #00ac96 !important;
+        border-style: solid !important;
+        border-width: 0 0 1px 0 !important;
+        padding: 0px !important;
+        color:#495057;
+        height: auto;
+        border-radius: 0;
+        background-color: #fff;
+        background-clip: padding-box;
+    }
+    .form-control:focus{
+        color: #495057;
+        background-color: #fff;
+        border-color: #fff;
+        outline: 0;
+        box-shadow: none;
+    }
+    .birthday-section{
+        padding: 15px;
+    }
+    .btn-class{
+        border-color: #00ac96;
+        color: #00ac96;
+    }
+    .btn-class:hover{
+        background-color:  #00ac96;
+        color: #fff;
     }
   </style>
 </head>
 <body>
-  <!-- Login / Signup Section -->
-  <section class="bg-light py-3 py-md-5">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4">
-          <div class="card border border-light-subtle rounded-3 shadow-sm">
-            <div class="card-body p-3 p-md-4 p-xl-5">
-              <div class="text-center mb-3">
-                <a href="#!">
-                  <img src="https://via.placeholder.com/175x57.png?text=BootstrapBrain+Logo" alt="BootstrapBrain Logo" width="175" height="57">
-                </a>
-              </div>
-              <h2 class="fs-6 fw-normal text-center text-secondary mb-4">Sign in to your account</h2>
-              <form id="loginForm">
-                <!-- Your login form here -->
-              </form>
-              <!-- Google Sign-in Button -->
-              <div id="googleSignIn" class="text-center mt-3">
-                <button class="btn btn-lg btn-outline-dark" onclick="googleSignIn()">Sign in with Google</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
-  
+  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-database.js"></script>
   <script>
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    // Firebase configuration
+    const firebaseConfig = {
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAqbaHNHq-z5hmhIW4Tnzl0--Wm5Aj49gE",
   authDomain: "alif-495ff.firebaseapp.com",
@@ -68,24 +77,53 @@ const firebaseConfig = {
   appId: "1:636697141623:web:f6bbef53e973cf24df4172",
   measurementId: "G-GWD6ZQJS0L"
 };
+    // Database reference
+    const database = firebase.database();
 
-    // Login Form
-    const loginForm = document.getElementById('loginForm');
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = loginForm['email'].value;
-      const password = loginForm['password'].value;
+    // Function to handle form submission
+    function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
       firebase.auth().signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-          // Logged in successfully
-          console.log('User logged in:', userCredential.user);
+          // User logged in successfully
+          const user = userCredential.user;
+          console.log('User logged in:', user);
           // Redirect or perform other actions after successful login
         })
         .catch((error) => {
+          // Handle errors
           console.error('Login error:', error.message);
           // Display error message to the user
         });
-    });
+    }
   </script>
+
+  <!-- Content Section -->
+  <div class="container">
+    <div class="row content">
+      <div class="col-md-6 mb-3">
+        <img src="path/to/your/image.jpg" alt="Image in login page">
+      </div>
+      <div class="col-md-6">
+        <h3 class="signin-text mb-3">Sign In</h3>
+        <form>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="form-control">
+          </div>
+          <div class="form-group form-check">
+            <input type="checkbox" id="checkbox" class="form-check-input">
+            <label class="form-check-label" for="checkbox">Remember Me</label>
+          </div>
+          <button type="button" class="btn btn-class" onclick="login()">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
