@@ -1,27 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Topic</title>
-  <!-- Firebase JavaScript SDK -->
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-storage.js"></script>
-  <!-- Your Firebase configuration -->
-  <script src="firebase-config.js"></script>
-  <!-- Your custom JavaScript file -->
-  <script src="create_topic.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Topic</title>
+    <!-- Include Firebase JavaScript SDK -->
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-firestore.js"></script>
 </head>
 <body>
-  <h1>Create a New Topic</h1>
-  <form id="createTopicForm">
-    <label for="topicTitle">Title:</label><br>
-    <input type="text" id="topicTitle" name="topicTitle" required><br>
-    <label for="topicContent">Content:</label><br>
-    <textarea id="topicContent" name="topicContent" rows="4" cols="50" required></textarea><br>
-    <button type="submit">Create Topic</button>
-  </form>
+    <h1>Create a New Topic</h1>
+    <form id="topicForm">
+        <label for="title">Topic Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="details">Topic Details:</label><br>
+        <textarea id="details" name="details"></textarea><br>
+        <button type="submit">Create Topic</button>
+    </form>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAqbaHNHq-z5hmhIW4Tnzl0--Wm5Aj49gE",
+  authDomain: "alif-495ff.firebaseapp.com",
+  projectId: "alif-495ff",
+  storageBucket: "alif-495ff.appspot.com",
+  messagingSenderId: "636697141623",
+  appId: "1:636697141623:web:f6bbef53e973cf24df4172",
+  measurementId: "G-GWD6ZQJS0L"
+};
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Get a reference to the Firestore service
+        const firestore = firebase.firestore();
+
+        // Reference to the topics collection
+        const topicsCollection = firestore.collection('topics');
+
+        // Form submission event listener
+        document.getElementById('topicForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Get form values
+            const title = document.getElementById('title').value;
+            const details = document.getElementById('details').value;
+
+            // Add the new topic to Firestore
+            topicsCollection.add({
+                title: title,
+                details: details,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(function(docRef) {
+                console.log('Document written with ID: ', docRef.id);
+                // Redirect to topic list page after successfully creating a topic
+                window.location.href = 'topic_list.html';
+            })
+            .catch(function(error) {
+                console.error('Error adding document: ', error);
+            });
+        });
+    </script>
 </body>
 </html>
