@@ -1,230 +1,117 @@
-
-        
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golden Age of Islamics</title>
-    <style>
-        /* Global styles */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f2f2f2;
-        }
-        header {
-            background-color: #3b5998;
-            color: white;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        header a {
-            color: white;
-            text-decoration: none;
-            margin-right: 10px;
-        }
-        .icon-button {
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            outline: none;
-            font-size: 20px;
-            color: white;
-        }
-        .icon-button:hover {
-            color: #ccc;
-        }
-        .post {
-            background-color: white;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-            padding: 20px;
-        }
-        .post-meta {
-            font-size: smaller;
-            color: #888;
-        }
-        .post-content {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .read-more {
-            color: blue;
-            cursor: pointer;
-        }
-        .hide {
-            display: none;
-        }
-        .profile-picture {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-        .details {
-            margin-top: 20px;
-        }
-    </style>
+    <title>Topic List</title>
+    <!-- Include Firebase JavaScript SDK -->
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-firestore.js"></script>
 </head>
 <body>
-    <!-- Header with icon buttons -->
-    <header>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/66/66453.png" alt="Home" class="icon-button"></a>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/61/61109.png" alt="Topics" class="icon-button"></a>
-        <button id="create-post-button" class="icon-button"><img src="https://image.flaticon.com/icons/png/128/61/61456.png" alt="Create Post"></button>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/109/109674.png" alt="Notifications" class="icon-button"></a>
-        <a href="#"><img src="https://image.flaticon.com/icons/png/128/126/126467.png" alt="Logout" class="icon-button"></a>
-    </header>
+    <h1>Topic List</h1>
+    <ul id="topicList"></ul>
 
-    <!-- Post Creation Form -->
-    <!-- Form is hidden initially and shown when the "Create New Post" button is clicked -->
-    <form id="post-form" style="display: none;">
-        <label for="post-title">Title:</label><br>
-        <input type="text" id="post-title" name="post-title" required><br><br>
-        
-        <label for="post-content">Content:</label><br>
-        <textarea id="post-content" name="post-content" rows="4" required></textarea><br><br>
-        
-        <button type="submit">Create Post</button>
+    <!-- Form to add new post to a topic -->
+    <h2>Add Post</h2>
+    <form id="postForm">
+        <label for="topic">Select Topic:</label><br>
+        <select id="topic" name="topic">
+            <!-- Options will be dynamically populated using JavaScript -->
+        </select><br>
+        <label for="content">Post Content:</label><br>
+        <textarea id="content" name="content"></textarea><br>
+        <button type="submit">Add Post</button>
     </form>
 
-    <!-- Actual Topic Name -->
-    <h1 id="topic-name">Topic Name</h1>
-
-    <!-- Posts -->
-    <div id="posts-list">
-        <!-- Posts associated with the topic will be dynamically added here -->
-    </div>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDZ4IjtvPGypB84evukROyNHwBvkhGyBkM",
-            authDomain: "alif-ac574.firebaseapp.com",
-            projectId: "alif-ac574",
-            storageBucket: "alif-ac574.appspot.com",
-            messagingSenderId: "261987716644",
-            appId: "1:261987716644:web:02d0beeee8a04f998a12b1",
-            measurementId: "G-YGQ1V6489M""
-        };
-
         // Initialize Firebase
+        const firebaseConfig = {
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAqbaHNHq-z5hmhIW4Tnzl0--Wm5Aj49gE",
+  authDomain: "alif-495ff.firebaseapp.com",
+  projectId: "alif-495ff",
+  storageBucket: "alif-495ff.appspot.com",
+  messagingSenderId: "636697141623",
+  appId: "1:636697141623:web:f6bbef53e973cf24df4172",
+  measurementId: "G-GWD6ZQJS0L"
+};
+        };
         firebase.initializeApp(firebaseConfig);
 
-        const db = firebase.database();
+        // Get a reference to the Firestore service
+        const firestore = firebase.firestore();
 
-        // Function to extract topic ID from URL parameter
-        function getTopicIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id');
-        }
+        // Reference to the topics collection
+        const topicsCollection = firestore.collection('topics');
 
-        // Retrieve and display topic details
-        const topicId = getTopicIdFromUrl();
-        if (topicId) {
-            // Code to fetch and display topic details
-            // For simplicity, let's assume the topic name is fetched from the database
-            const topicName = "Sample Topic"; // Replace with actual topic name
-            document.getElementById('topic-name').textContent = topicName;
+        // Reference to the posts collection
+        const postsCollection = firestore.collection('posts');
 
-            // Retrieve and display posts associated with the topic
-            db.ref('posts').orderByChild('topicId').equalTo(topicId).on('value', (snapshot) => {
-                document.getElementById('posts-list').innerHTML = ''; // Clear previous posts
-                snapshot.forEach((childSnapshot) => {
-                    const post = childSnapshot.val();
-                    const postElement = document.createElement('div');
-                    postElement.classList.add('post');
-                    postElement.innerHTML = `
-                        <img src="sample_profile_picture.jpg" alt="Profile Picture" class="profile-picture">
-                        <h2>${post.title}</h2>
-                        <div class="post-meta">
-                            <span>${post.author}</span> | 
-                            <span>${formatTime(post.createdAt)}</span>
-                        </div>
-                        <p class="post-content">${truncateText(post.content)}</p>
-                        <p class="read-more" onclick="togglePostContent(this, '${post.content}')">Read More...</p>
-                        <div class="details hide">
-                            <!-- Additional details will be dynamically loaded here -->
-                        </div>
-                        <hr>
-                        <button onclick="likePost('${childSnapshot.key}')">Like</button>
-                        <button onclick="commentPost('${childSnapshot.key}')">Comment</button>
-                    `;
-                    document.getElementById('posts-list').appendChild(postElement);
+        // Function to render topics
+        function renderTopics(topics) {
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = ''; // Clear previous list items
+
+            topics.forEach(topic => {
+                const li = document.createElement('li');
+                li.textContent = topic.title;
+                li.addEventListener('click', function() {
+                    // Redirect to a page where users can view posts for this topic
+                    window.location.href = `topic_posts.html?topicId=${topic.id}`;
                 });
+                topicList.appendChild(li);
             });
-        } else {
-            console.error('Topic ID not found in URL parameter!');
-            alert('Topic ID not found in URL parameter.');
         }
 
-        // Function to format time (e.g., Today, Yesterday, Just Now, 1 year ago, etc.)
-        function formatTime(timestamp) {
-            // To be implemented
-            // Return formatted time string based on the timestamp
+        // Function to populate select options with topics
+        function populateTopicsSelect(topics) {
+            const select = document.getElementById('topic');
+            select.innerHTML = ''; // Clear previous options
+
+            topics.forEach(topic => {
+                const option = document.createElement('option');
+                option.value = topic.id;
+                option.textContent = topic.title;
+                select.appendChild(option);
+            });
         }
 
-        // Function to truncate text and add "Read More..." link
-        function truncateText(text) {
-            const maxLength = 100; // Maximum length of truncated text
-            if (text.length > maxLength) {
-                return text.slice(0, maxLength) + '...';
-            } else {
-                return text;
-            }
-        }
+        // Fetch all topics from Firestore
+        topicsCollection.get().then(snapshot => {
+            const topics = [];
+            snapshot.forEach(doc => {
+                topics.push({ id: doc.id, ...doc.data() });
+            });
+            renderTopics(topics); // Render topics list
+            populateTopicsSelect(topics); // Populate select options with topics
+        });
 
-        // Function to toggle post content visibility
-        function togglePostContent(element, fullContent) {
-            const postContent = element.previousSibling;
-            const details = element.nextSibling;
-            if (postContent.classList.contains('hide')) {
-                postContent.textContent = fullContent;
-                postContent.classList.remove('hide');
-                element.textContent = 'Hide';
-                loadPostDetails(details); // Load additional details
-                details.classList.remove('hide');
-            } else {
-                postContent.textContent = truncateText(fullContent);
-                postContent.classList.add('hide');
-                element.textContent = 'Read More...';
-                details.classList.add('hide');
-            }
-        }
+        // Form submission event listener to add new post
+        document.getElementById('postForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
 
-        // Function to load additional details of a post
-        function loadPostDetails(detailsElement) {
-            // Simulate loading of additional details (e.g., comments, likes) from the database
-            setTimeout(() => {
-                // Example additional details
-                detailsElement.innerHTML = `
-                    <p>Additional details:</p>
-                    <p>Comments: 5</p>
-                    <p>Likes: 10</p>
-                    <!-- Add more details as needed -->
-                `;
-            }, 1000); // Simulate 1 second delay for loading
-        }
+            // Get form values
+            const topicId = document.getElementById('topic').value;
+            const content = document.getElementById('content').value;
 
-        // Function to like a post
-        function likePost(postId) {
-            // Logic to like the post and update the database
-            console.log("Liked post:", postId);
-        }
-
-        // Function to comment on a post
-        function commentPost(postId) {
-            // Logic to add a comment to the post and update the database
-            console.log("Commented on post:", postId);
-        }
+            // Add the new post to Firestore
+            postsCollection.add({
+                topicId: topicId,
+                content: content,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(function(docRef) {
+                console.log('Post added with ID: ', docRef.id);
+                // Clear form fields after successful submission
+                document.getElementById('content').value = '';
+                // Optionally, you can notify the user that the post has been added
+            })
+            .catch(function(error) {
+                console.error('Error adding post: ', error);
+            });
+        });
     </script>
 </body>
 </html>
