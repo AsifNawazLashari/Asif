@@ -3,66 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
-  <!-- Bootstrap CSS -->
-  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css'>
-  <!-- Google Fonts -->
-  <link href='https://fonts.googleapis.com/css2?family=Poppins&display=swap' rel='stylesheet'>
-  <style>
-    /* CSS styles */
-  </style>
+  <title>Create Topic</title>
+  <!-- Firebase JavaScript SDK -->
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-storage.js"></script>
+  <!-- Your Firebase configuration -->
+  <script src="firebase-config.js"></script>
+  <!-- Your custom JavaScript file -->
+  <script src="create_topic.js"></script>
 </head>
 <body>
-  <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-      <a class="navbar-brand" href="#">Home</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="redirectToQuestionIndex()">Create Question</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="redirectToCreateTopic()">Create Topic</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
-  <script>
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAqbaHNHq-z5hmhIW4Tnzl0--Wm5Aj49gE",
-  authDomain: "alif-495ff.firebaseapp.com",
-  projectId: "alif-495ff",
-  storageBucket: "alif-495ff.appspot.com",
-  messagingSenderId: "636697141623",
-  appId: "1:636697141623:web:f6bbef53e973cf24df4172",
-  measurementId: "G-GWD6ZQJS0L"
-};
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-
-    // Function to redirect to the question index page
-    function redirectToQuestionIndex() {
-      window.location.href = "question_index.html";
-    }
-
-    // Function to redirect to the create topic page
-    function redirectToCreateTopic() {
-      window.location.href = "create_topic.html";
-    }
-  </script>
+  <h1>Create a New Topic</h1>
+  <form id="createTopicForm">
+    <label for="topicTitle">Title:</label><br>
+    <input type="text" id="topicTitle" name="topicTitle" required><br>
+    <label for="topicContent">Content:</label><br>
+    <textarea id="topicContent" name="topicContent" rows="4" cols="50" required></textarea><br>
+    <button type="submit">Create Topic</button>
+  </form>
 </body>
 </html>
