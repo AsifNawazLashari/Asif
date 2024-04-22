@@ -1,138 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login / Signup</title>
-  <!-- Bootstrap CSS -->
-  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css'>
-  <!-- Google Fonts -->
-  <link href='https://fonts.googleapis.com/css2?family=Poppins&display=swap' rel='stylesheet'>
-  <style>
-    body{
-        font-family: 'Poppins', sans-serif;
-        background-color: #00ac96;
-    }
-    .content{
-        margin: 8%;
-        background-color: #fff;
-        padding: 4rem 1rem 4rem 1rem;
-        box-shadow: 0 0 5px 5px rgba(0,0,0, .05);
-    }
-    .signin-text{
-        font-style: normal;
-        font-weight: 600 !important;
-    }
-    .form-control{
-        display: block;
-        width:100%;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height:1.5;
-        border-color: #00ac96 !important;
-        border-style: solid !important;
-        border-width: 0 0 1px 0 !important;
-        padding: 0px !important;
-        color:#495057;
-        height: auto;
-        border-radius: 0;
-        background-color: #fff;
-        background-clip: padding-box;
-    }
-    .form-control:focus{
-        color: #495057;
-        background-color: #fff;
-        border-color: #fff;
-        outline: 0;
-        box-shadow: none;
-    }
-    .birthday-section{
-        padding: 15px;
-    }
-    .btn-class{
-        border-color: #00ac96;
-        color: #00ac96;
-    }
-    .btn-class:hover{
-        background-color:  #00ac96;
-        color: #fff;
-    }
-
-    /* Responsive styles */
-    @media (max-width: 768px) {
-      .content {
-        margin: 4%;
-        padding: 2rem 0.5rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <!-- Include global CSS styles -->
+    <style>
+        /* Add global CSS styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5; /* Lighter background color */
+        }
+        .content {
+            margin: 8% auto; /* Center the content */
+            background-color: #fff;
+            padding: 4rem 2rem; /* Increased padding */
+            box-shadow: 0 0 5px 5px rgba(0,0,0, .05);
+            max-width: 600px; /* Increased content width */
+        }
+        .signin-text {
+            font-style: normal;
+            font-weight: 600 !important;
+            text-align: center;
+            margin-bottom: 0; /* Reduced margin */
+        }
+        .form-control {
+            display: block;
+            width:100%;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height:1.5;
+            border-color: #00ac96 !important;
+            border-style: solid !important;
+            border-width: 0 0 1px 0 !important;
+            padding: 0px !important;
+            color:#495057;
+            height: auto;
+            border-radius: 0;
+            background-color: #fff;
+            background-clip: padding-box;
+            margin-bottom: 1rem;
+        }
+        .form-control:focus {
+            color: #495057;
+            background-color: #fff;
+            border-color: #fff;
+            outline: 0;
+            box-shadow: none;
+        }
+        .btn-class {
+            border-color: #00ac96;
+            color: #00ac96;
+        }
+        .btn-class:hover {
+            background-color:  #00ac96;
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
-  <script>
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAqbaHNHq-z5hmhIW4Tnzl0--Wm5Aj49gE",
-  authDomain: "alif-495ff.firebaseapp.com",
-  projectId: "alif-495ff",
-  storageBucket: "alif-495ff.appspot.com",
-  messagingSenderId: "636697141623",
-  appId: "1:636697141623:web:f6bbef53e973cf24df4172",
-  measurementId: "G-GWD6ZQJS0L"
-};
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    <!-- Sign-in form content -->
+    <h1 class="signin-text">Sign In</h1>
+    <form id="signin-form" class="content">
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" class="form-control" required><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" class="form-control" required><br>
+        <button type="submit" class="btn btn-class">Sign In</button>
+    </form>
 
-    // Database reference
-    const database = firebase.database();
-
-    // Function to handle form submission
-    function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          // User logged in successfully
-          const user = userCredential.user;
-          console.log('User logged in:', user);
-          // Redirect or perform other actions after successful login
-        })
-        .catch((error) => {
-          // Handle errors
-          console.error('Login error:', error.message);
-          // Display error message to the user
-        });
-    }
-  </script>
-
-  <!-- Content Section -->
-  <div class="container">
-    <div class="row content">
-      <div class="col-md-6 mb-3">
-        <img src="header.jpg" alt="Header Image" class="img-fluid">
-      </div>
-      <div class="col-md-6">
-        <h3 class="signin-text mb-3">Largest Science Community In Pakistan</h3>
-        <form>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" class="form-control">
-          </div>
-          <div class="form-group form-check">
-            <input type="checkbox" id="checkbox" class="form-check-input">
-            <label class="form-check-label" for="checkbox">Remember Me</label>
-          </div>
-          <button type="button" class="btn btn-class" onclick="login()">Login</button>
-        </form>
-      </div>
-    </div>
-  </div>
+    <!-- Firebase SDK and custom JavaScript -->
 </body>
 </html>
